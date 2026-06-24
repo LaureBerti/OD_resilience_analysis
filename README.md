@@ -208,4 +208,4 @@ This repository is the data-availability record for the paper.
 
 ## License
 
-MIT License. Contact: laure.berti@ird.fr
+MIT License
