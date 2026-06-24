@@ -178,10 +178,7 @@ dominate because the new EIF/ROD/ADOD detectors are compute-intensive at scale.
 
 ## Data Availability
 
-This repository is the data-availability record for the paper, per the
-[PLOS Data Availability policy](https://journals.plos.org/plosone/s/data-availability).
-See **[DATA_AVAILABILITY.md](DATA_AVAILABILITY.md)** for the full statement, the
-derived-data inventory, and per-dataset provenance.
+This repository is the data-availability record for the paper.
 
 - **Derived data** (the per-condition resilience results underlying every table/figure):
   `results/*.csv` and `tables/*.csv` — included here, regenerated deterministically
@@ -193,11 +190,9 @@ derived-data inventory, and per-dataset provenance.
 - **Persistent identifier:** this repository is archived on
   [Zenodo](https://doi.org/10.5281/zenodo.20829793) with DOI
   **`10.5281/zenodo.20829793`** — the citable, long-term record required by PLOS
-  (GitHub alone is not sufficient). Details in [DATA_AVAILABILITY.md](DATA_AVAILABILITY.md).
 
-> For a PLOS submission the derived data + code are **publicly accessible at submission**
-> (Zenodo DOI above) — not gated "upon acceptance". The benchmark datasets are already
-> public via ADBench/UCI.
+
+>  The benchmark datasets are already public via ADBench/UCI.
 
 ---
 
