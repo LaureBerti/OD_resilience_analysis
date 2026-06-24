@@ -178,8 +178,7 @@ dominate because the new EIF/ROD/ADOD detectors are compute-intensive at scale.
 
 ## Data Availability
 
-This repository is the data-availability record for the paper, per the
-[PLOS Data Availability policy](https://journals.plos.org/plosone/s/data-availability).
+This repository is the data-availability record for the paper.
 See **[DATA_AVAILABILITY.md](DATA_AVAILABILITY.md)** for the full statement, the
 derived-data inventory, and per-dataset provenance.
 
