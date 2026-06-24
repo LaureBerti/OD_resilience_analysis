@@ -81,9 +81,9 @@ UCI Machine Learning Repository: <https://archive.ics.uci.edu/>.
 
 ---
 
-## Persistent identifier (Zenodo DOI — required by PLOS)
+## Persistent identifier (Zenodo DOI)
 
-GitHub alone does not provide long-term preservation, so PLOS requires a DOI. This
+GitHub alone does not provide long-term preservation. This
 repository is archived on Zenodo with a persistent, citable DOI:
 
 > **DOI:** [10.5281/zenodo.20829793](https://doi.org/10.5281/zenodo.20829793)
