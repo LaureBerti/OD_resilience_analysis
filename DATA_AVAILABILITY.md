@@ -1,8 +1,7 @@
 # Data Availability
 
 This repository contains everything required to replicate the findings of
-*"Outlier Detection Methods Are Not Equally Resilient to Sampling"*, in compliance
-with the [PLOS Data Availability policy](https://journals.plos.org/plosone/s/data-availability).
+*"Outlier Detection Methods Are Not Equally Resilient to Sampling"*.
 
 There are two kinds of data:
 
@@ -15,7 +14,6 @@ There are two kinds of data:
 
 ---
 
-## Ready-to-paste Data Availability Statement (for the PLOS submission box)
 
 > The minimal data set underlying the findings — the per-condition resilience results
 > (CSV) and the complete analysis code — is available in the OD_resilience_analysis repository,
