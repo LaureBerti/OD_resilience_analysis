@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the paper."
+type: software
+title: "Outlier Detection Methods Are Not Equally Resilient to Sampling"
+authors:
+  - family-names: Berti-Équille
+    given-names: Laure
+    email: laure.berti@ird.fr
+    orcid: "https://orcid.org/0000-0002-8046-0570"
+  - family-names: Loh
+    given-names: Ji Meng
+repository-code: "https://github.com/LaureBerti/OD_resilience"
+license: MIT
+version: "2.0.0"
+date-released: "2026-06-12"
+preferred-citation:
+  type: article
+  title: "Outlier Detection Methods Are Not Equally Resilient to Sampling"
+  authors:
+    - family-names: Berti-Equille
+      given-names: Laure
+    - family-names: Loh
+      given-names: Ji Meng
+  journal: "Manuscript under review"
+  year: 2026
+  status: under review

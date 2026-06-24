@@ -1,0 +1,48 @@
+# Requirements for outlier resilience experiments
+# Paper: Estimating the Resilience to Sampling of Outlier Detection Methods
+# Target: KAIS 2026
+#
+# Python 3.13 / macOS note
+# ─────────────────────────────────────────────────────────────────────────────
+# All pyod versions (0.9.x through 3.x) require numba, which requires llvmlite.
+# On macOS + Python 3.13, no pre-built llvmlite wheel exists — pip falls back to
+# compiling from source, which requires cmake.
+#
+# TWO OPTIONS:
+#
+# Option A — install cmake (recommended, one command):
+#   brew install cmake
+#   pip install -r requirements.txt
+#
+# Option B — install pyod without its optional numba dep (no cmake needed):
+#   bash setup_env.sh
+#   (This installs pyod --no-deps, skipping numba. AutoEncoder is disabled.)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Core scientific stack
+numpy>=1.24
+pandas>=2.0
+scipy>=1.11
+scikit-learn>=1.3
+
+# Outlier detection
+# pyod 3.x imports numba unconditionally in pyod/utils/stat_models.py → llvmlite → LLVM dev.
+# On macOS 26 (Tahoe) + Python 3.13, no llvmlite wheel exists yet; use setup_env.sh instead.
+pyod>=1.1.0
+
+# ADBench datasets (optional — can also download .npz manually)
+# adbench>=0.1
+
+# Visualization
+matplotlib>=3.7
+seaborn>=0.12
+
+# Progress bars
+tqdm>=4.65
+
+# Statistical post-hoc tests (Dunn test for E1)
+scikit-posthocs>=0.7.0
+
+# Deep learning backend for AutoEncoder (optional — AutoEncoder is skipped if absent)
+# torch>=2.0.0
