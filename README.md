@@ -193,9 +193,7 @@ derived-data inventory, and per-dataset provenance.
   DOI (`10.5281/zenodo.XXXXXXX`) — required by PLOS; GitHub alone is not sufficient.
   Steps in [DATA_AVAILABILITY.md](DATA_AVAILABILITY.md).
 
-> For a PLOS submission the derived data + code must be **publicly accessible at
-> submission** (a placeholder DOI is accepted, finalised before publication) — not gated
-> "upon acceptance". The benchmark datasets are already public via ADBench/UCI.
+> The benchmark datasets are already public via ADBench/UCI.
 
 ---
 
