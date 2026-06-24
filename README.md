@@ -179,8 +179,6 @@ dominate because the new EIF/ROD/ADOD detectors are compute-intensive at scale.
 ## Data Availability
 
 This repository is the data-availability record for the paper.
-See **[DATA_AVAILABILITY.md](DATA_AVAILABILITY.md)** for the full statement, the
-derived-data inventory, and per-dataset provenance.
 
 - **Derived data** (the per-condition resilience results underlying every table/figure):
   `results/*.csv` and `tables/*.csv` — included here, regenerated deterministically
@@ -191,7 +189,7 @@ derived-data inventory, and per-dataset provenance.
   [UCI ML Repository](https://archive.ics.uci.edu/).
 - **Persistent identifier:** archive a release on [Zenodo](https://zenodo.org) to mint a
   DOI (`10.5281/zenodo.XXXXXXX`) — required by PLOS; GitHub alone is not sufficient.
-  Steps in [DATA_AVAILABILITY.md](DATA_AVAILABILITY.md).
+
 
 > The benchmark datasets are already public via ADBench/UCI.
 
