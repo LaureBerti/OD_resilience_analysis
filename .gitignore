@@ -6,3 +6,6 @@ __pycache__/
 data/*.npz
 *.egg-info/
 .env
+
+# Local build/distribution artifact (not part of the published repo)
+OD_resilience.zip

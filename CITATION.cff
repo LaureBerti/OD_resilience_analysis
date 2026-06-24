@@ -9,7 +9,12 @@ authors:
     orcid: "https://orcid.org/0000-0002-8046-0570"
   - family-names: Loh
     given-names: Ji Meng
-repository-code: "https://github.com/LaureBerti/OD_resilience"
+repository-code: "https://github.com/LaureBerti/OD_resilience_analysis"
+doi: "10.5281/zenodo.20829793"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.20829793"
+    description: "Zenodo archive of this repository (concept DOI)"
 license: MIT
 version: "2.0.0"
 date-released: "2026-06-12"
@@ -17,7 +22,7 @@ preferred-citation:
   type: article
   title: "Outlier Detection Methods Are Not Equally Resilient to Sampling"
   authors:
-    - family-names: Berti-Equille
+    - family-names: Berti-Équille
       given-names: Laure
     - family-names: Loh
       given-names: Ji Meng
