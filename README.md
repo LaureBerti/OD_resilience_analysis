@@ -187,8 +187,6 @@ This repository is the data-availability record for the paper.
   [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`);
   fetch with `python download_datasets.py`. Full-scale Covertype/Skin also at the
   [UCI ML Repository](https://archive.ics.uci.edu/).
-- **Persistent identifier:** archive a release on [Zenodo](https://zenodo.org) to mint a
-  DOI (`10.5281/zenodo.XXXXXXX`) — required by PLOS; GitHub alone is not sufficient.
 
 
 > The benchmark datasets are already public via ADBench/UCI.
