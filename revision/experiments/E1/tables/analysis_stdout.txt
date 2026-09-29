@@ -1,0 +1,78 @@
+units: 288  incomplete: 0  with degenerate reps: 2  with errors: 0
+rho_tilde class means: {'I': 0.895, 'II': 0.915, 'III': 0.928, 'IV': 0.588}
+   class          method  T1_mean  T1_sd  T1_n  T2_mean  T2_sd  T2_n  T3_mean  T3_sd  T3_n  T4_mean  T4_sd  T4_n  All_mean  All_sd  All_n
+0      I      ThreeSigma     0.67   0.11     5     0.88   0.06     7     0.89   0.06     2     0.94   0.02     2      0.82    0.13     16
+1      I         BoxPlot     0.69   0.16     5     0.78   0.13     7     0.94   0.06     2     0.92    NaN     1      0.78    0.15     15
+2      I             MAD     0.57   0.15     5     0.88   0.15     7     0.75   0.21     2     0.94   0.07     2      0.77    0.20     16
+3      I       ChiSquare     0.81   0.09     5     0.92   0.05     7     0.93   0.00     2     0.97   0.01     2      0.89    0.08     16
+4      I     Mahalanobis     0.50   0.27     5     0.83   0.12     7     0.89   0.03     2     0.92   0.04     2      0.75    0.24     16
+5      I             ROD     0.34   0.09     5     0.59   0.08     7     0.68   0.04     2     0.78   0.08     2      0.55    0.18     16
+6     II           COPOD     0.79   0.08     5     0.89   0.06     7     0.80   0.18     2     0.93   0.03     2      0.85    0.09     16
+7     II            ECOD     0.80   0.09     5     0.90   0.06     7     0.94   0.02     2     0.94   0.03     2      0.88    0.08     16
+8     II            HBOS     0.62   0.15     5     0.80   0.11     7     0.56   0.12     2     0.86   0.04     2      0.72    0.16     16
+9    III         IForest     0.73   0.03     5     0.81   0.10     7     0.91   0.02     2     0.87   0.03     2      0.80    0.09     16
+10   III             EIF     0.75   0.05     5     0.83   0.09     7     0.93   0.03     2     0.88   0.03     2      0.83    0.09     16
+11    IV             LOF     0.26   0.20     5     0.41   0.16     7     0.36   0.06     2     0.28   0.01     2      0.34    0.16     16
+12    IV             KNN     0.70   0.09     5     0.64   0.18     7     0.67   0.04     2     0.50   0.11     2      0.64    0.14     16
+13    IV            ABOD     0.49   0.24     5     0.47   0.17     7     0.59   0.07     2     0.20   0.15     2      0.46    0.20     16
+14    IV  FeatureBagging     0.41   0.16     5     0.40   0.13     7     0.27   0.04     2     0.24   0.22     2      0.37    0.15     16
+15    IV            ADOD     0.44   0.16     5     0.54   0.25     7     0.80   0.13     2     0.72   0.03     2      0.56    0.22     16
+16     G          KMeans     0.14   0.15     5     0.73   0.08     7     0.68   0.03     2     0.79   0.03     2      0.55    0.30     16
+17     G           OCSVM     0.85   0.03     5     0.91   0.07     7     0.99   0.00     2     0.96   0.00     2      0.91    0.07     16
+18     I    Class I mean     0.60   0.06     5     0.81   0.08     7     0.85   0.00     2     0.91   0.04     2      0.76    0.14     16
+19    II   Class II mean     0.73   0.10     5     0.87   0.07     7     0.76   0.11     2     0.91   0.01     2      0.82    0.10     16
+20   III  Class III mean     0.74   0.04     5     0.82   0.10     7     0.92   0.02     2     0.87   0.03     2      0.81    0.09     16
+21    IV   Class IV mean     0.46   0.13     5     0.49   0.14     7     0.54   0.03     2     0.39   0.06     2      0.48    0.12     16
+22     G    Class G mean     0.49   0.07     5     0.82   0.07     7     0.83   0.02     2     0.87   0.01     2      0.73    0.17     16
+                                                                            test  n_blocks  statistic   df             p                                effect    p_holm
+0                                    Friedman (classes I-IV, datasets as blocks)        16  32.475000  3.0  4.155870e-07                       Kendall W=0.677       NaN
+1                                 Wilcoxon signed-rank I vs II (datasets paired)        16  24.000000  NaN  2.139282e-02  median diff=-0.041; mean diff=-0.055  0.064178
+2                                Wilcoxon signed-rank I vs III (datasets paired)        16  30.000000  NaN  5.065918e-02  median diff=-0.038; mean diff=-0.052  0.101318
+3                                 Wilcoxon signed-rank I vs IV (datasets paired)        16   0.000000  NaN  3.051758e-05  median diff=+0.307; mean diff=+0.287  0.000183
+4                               Wilcoxon signed-rank II vs III (datasets paired)        16  61.000000  NaN  7.435608e-01  median diff=+0.029; mean diff=+0.003  0.743561
+5                                Wilcoxon signed-rank II vs IV (datasets paired)        16   0.000000  NaN  3.051758e-05  median diff=+0.278; mean diff=+0.342  0.000183
+6                               Wilcoxon signed-rank III vs IV (datasets paired)        16   0.000000  NaN  3.051758e-05  median diff=+0.366; mean diff=+0.339  0.000183
+7   Mixed model: C(method_class, Treatment('I'))[T.II] (random: dataset, method)        16   0.056975  NaN  3.300187e-02                 95% CI [0.005, 0.109]       NaN
+8  Mixed model: C(method_class, Treatment('I'))[T.III] (random: dataset, method)        16   0.053990  NaN  9.495028e-02                95% CI [-0.009, 0.117]       NaN
+9   Mixed model: C(method_class, Treatment('I'))[T.IV] (random: dataset, method)        16  -0.284755  NaN  1.624897e-67               95% CI [-0.317, -0.253]       NaN
+            method method_class  n_datasets    rho  rho_tilde   diff  wilcoxon_p  p_holm
+0       ThreeSigma            I          16  0.822      0.938  0.116       0.000   0.000
+1          BoxPlot            I          15  0.781      0.874  0.093       0.001   0.003
+2              MAD            I          16  0.772      0.922  0.150       0.000   0.001
+3        ChiSquare            I          16  0.892      0.964  0.071       0.000   0.000
+4      Mahalanobis            I          16  0.747      0.862  0.114       0.001   0.003
+5              ROD            I          16  0.547      0.807  0.259       0.000   0.002
+6            COPOD           II          16  0.850      0.937  0.087       0.000   0.000
+7             ECOD           II          16  0.880      0.965  0.085       0.000   0.001
+8             HBOS           II          16  0.722      0.844  0.122       0.000   0.002
+9          IForest          III          16  0.803      0.924  0.121       0.000   0.000
+10             EIF          III          16  0.825      0.932  0.106       0.000   0.000
+11             LOF           IV          16  0.341      0.330 -0.011       0.410   0.410
+12             KNN           IV          16  0.645      0.805  0.161       0.000   0.001
+13            ABOD           IV          16  0.459      0.628  0.170       0.000   0.000
+14  FeatureBagging           IV          16  0.370      0.418  0.048       0.106   0.211
+15            ADOD           IV          16  0.563      0.760  0.197       0.000   0.002
+16          KMeans            G          16  0.547      0.631  0.084       0.007   0.020
+17           OCSVM            G          16  0.905      0.964  0.059       0.000   0.001
+                  rho  rho_adapt  rho_def1  max_abs_diff_rho_adapt
+method                                                            
+ThreeSigma      0.822      0.853     0.800                   0.227
+BoxPlot         0.781      0.796     0.744                   0.154
+MAD             0.772      0.790     0.739                   0.188
+ChiSquare       0.892      0.928     0.844                   0.156
+Mahalanobis     0.747      0.771     0.731                   0.181
+ROD             0.547      0.574     0.547                   0.195
+COPOD           0.850      0.860     0.795                   0.107
+ECOD            0.880      0.900     0.832                   0.116
+HBOS            0.722      0.743     0.698                   0.135
+IForest         0.803      0.830     0.769                   0.176
+EIF             0.825      0.853     0.793                   0.125
+LOF             0.341      0.342     0.332                   0.079
+KNN             0.645      0.665     0.619                   0.262
+ABOD            0.459      0.467     0.430                   0.109
+FeatureBagging  0.370      0.372     0.349                   0.041
+ADOD            0.563      0.582     0.546                   0.182
+KMeans          0.547      0.554     0.547                   0.047
+OCSVM           0.905      0.925     0.844                   0.139
+   class_I  class_II  class_III  class_IV  ratio_IV_over_I
+0    0.762     0.817      0.814     0.475            2.205

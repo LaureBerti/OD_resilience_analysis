@@ -9,3 +9,9 @@ data/*.npz
 
 # Local build/distribution artifact (not part of the published repo)
 OD_resilience.zip
+
+# Revision (PLOS ONE): downloaded extra datasets and external code are not versioned
+data/extra/*.npz
+external/
+revision/experiments/_smoke*/
+/*.log

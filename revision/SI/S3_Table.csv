@@ -1,0 +1,30 @@
+dataset,N,d,outlier_pct,tier,N_ref,const_feats,dup_rows,set,source
+lympho,148,18,4.05,T1,148,0,0,core,ADBench classical
+glass,214,7,4.21,T1,214,0,1,core,ADBench classical
+vertebral,240,6,12.5,T1,240,0,0,core,ADBench classical
+ionosphere,351,32,35.9,T1,351,0,1,core,ADBench classical
+breastw,683,9,34.99,T1,683,0,234,core,ADBench classical
+letter,1600,32,6.25,T2,1600,0,2,core,ADBench classical
+musk,3062,166,3.17,T2,3062,0,0,core,ADBench classical
+thyroid,3772,6,2.47,T2,3772,0,116,core,ADBench classical
+optdigits,5216,64,2.88,T2,5000,2,18,core,ADBench classical
+satellite,6435,36,31.64,T2,5000,0,0,core,ADBench classical
+pendigits,6870,16,2.27,T2,5000,0,0,core,ADBench classical
+annthyroid,7200,6,7.42,T2,5000,0,138,core,ADBench classical
+shuttle,49097,9,7.15,T3,5000,0,0,core,ADBench classical
+smtp,95156,3,0.03,T3,5000,0,23926,core,ADBench classical
+skin,245057,3,20.75,T4,5000,0,193624,core,ADBench classical
+covertype,286048,10,0.96,T4,5000,0,0,core,ADBench classical
+cardio,1831,21,9.61,T2,1831,0,9,E2-extra,ODDS via ADOD repository
+vowels,1456,12,3.43,T2,1456,0,4,E2-extra,ODDS via ADOD repository
+waveform,3443,21,2.9,T2,3443,0,0,E2-extra,ADBench via ADOD repository
+speech,3686,400,1.65,T2,3686,0,0,E2-extra,ODDS via ADOD repository
+pageblocks,5393,10,9.46,T2,5000,0,0,E2-extra,ADBench via ADOD repository
+satimage2,5803,36,1.22,T2,5000,0,2,E2-extra,ODDS via ADOD repository
+mnist,7603,100,9.21,T2,5000,22,0,E2-extra,ODDS via ADOD repository
+mammography,11183,6,2.32,T3,5000,0,3335,E2-extra,ODDS via ADOD repository
+magic_gamma,19020,10,35.16,T3,5000,0,115,E2-extra,ADBench via ADOD repository
+campaign,41188,62,11.27,T3,5000,0,12,E2-extra,ADBench via ADOD repository
+celeba,202599,39,2.24,T4,5000,0,88616,E2-extra,ADBench via ADOD repository
+fraud,284807,29,0.17,T4,5000,0,9146,E2-extra,ADBench via ADOD repository
+http,567498,3,0.39,T4,5000,0,345598,E2-extra,ODDS via ADOD repository

@@ -1,0 +1,11 @@
+test,n_blocks,statistic,df,p,effect,p_holm
+"Friedman (classes I-IV, datasets as blocks)",16,32.474999999999966,3.0,4.155870015182273e-07,Kendall W=0.677,
+Wilcoxon signed-rank I vs II (datasets paired),16,24.0,,0.021392822265625,median diff=-0.041; mean diff=-0.055,0.064178466796875
+Wilcoxon signed-rank I vs III (datasets paired),16,30.0,,0.0506591796875,median diff=-0.038; mean diff=-0.052,0.101318359375
+Wilcoxon signed-rank I vs IV (datasets paired),16,0.0,,3.0517578125e-05,median diff=+0.307; mean diff=+0.287,0.00018310546875
+Wilcoxon signed-rank II vs III (datasets paired),16,61.0,,0.743560791015625,median diff=+0.029; mean diff=+0.003,0.743560791015625
+Wilcoxon signed-rank II vs IV (datasets paired),16,0.0,,3.0517578125e-05,median diff=+0.278; mean diff=+0.342,0.00018310546875
+Wilcoxon signed-rank III vs IV (datasets paired),16,0.0,,3.0517578125e-05,median diff=+0.366; mean diff=+0.339,0.00018310546875
+"Mixed model: C(method_class, Treatment('I'))[T.II] (random: dataset, method)",16,0.05697523907408829,,0.0330018705287456,"95% CI [0.005, 0.109]",
+"Mixed model: C(method_class, Treatment('I'))[T.III] (random: dataset, method)",16,0.0539900645657888,,0.09495027712990442,"95% CI [-0.009, 0.117]",
+"Mixed model: C(method_class, Treatment('I'))[T.IV] (random: dataset, method)",16,-0.28475479692324535,,1.6248966910969885e-67,"95% CI [-0.317, -0.253]",

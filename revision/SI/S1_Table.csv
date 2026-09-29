@@ -1,0 +1,7 @@
+comparison,method,dataset,records,spearman_rank_correlation,overlap_of_top_10pct,sd_scores_earlier_or_authors,sd_scores_reference_or_ours
+ADOD: our implementation vs authors' code,ADOD,lympho,148,1.0,1.0,0.3594,0.3594
+ADOD: our implementation vs authors' code,ADOD,glass,214,1.0,1.0,0.0428,0.0428
+ADOD: our implementation vs authors' code,ADOD,vertebral,240,1.0,1.0,22.4432,22.4432
+ADOD: our implementation vs authors' code,ADOD,ionosphere,351,1.0,1.0,0.5954,0.5954
+ADOD: our implementation vs authors' code,ADOD,breastw,683,1.0,1.0,0.1431,0.1431
+ADOD: our implementation vs authors' code,ADOD,annthyroid,1000,1.0,1.0,0.019,0.019

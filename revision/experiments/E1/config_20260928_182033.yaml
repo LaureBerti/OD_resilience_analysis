@@ -1,0 +1,13 @@
+exp: E1
+run:
+  exp: E1
+  methods: []
+  datasets: []
+  ps: []
+  n_reps: 0
+  n_cap: -1
+  q: 0.1
+  n_jobs: 14
+  base_seed: 42
+  out_root: revision/experiments
+  variants: []

@@ -1,0 +1,7 @@
+dataset,p,n
+breastw,0.01,6
+glass,0.01,2
+ionosphere,0.01,3
+lympho,0.01,2
+lympho,0.05,7
+vertebral,0.01,2

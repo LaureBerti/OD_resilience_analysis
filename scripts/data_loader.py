@@ -58,7 +58,10 @@ _ADBENCH_NAME_MAP = _NPZ_FILENAME_MAP
 
 # Default data directory: Outlier_resilience/data/
 # scripts/ -> github_repo/ -> Outlier_resilience/ -> data/
-_DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+_HERE_DL = Path(__file__).resolve().parent
+# data/ sits next to scripts/ in the public repository, and two levels up in the paper project
+_DEFAULT_DATA_DIR = next((d for d in (_HERE_DL.parent / "data", _HERE_DL.parent.parent / "data")
+                          if any(d.glob("*.npz"))), _HERE_DL.parent / "data")
 
 
 def _load_from_adbench_package(dataset_name: str) -> Optional[tuple]:

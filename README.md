@@ -1,74 +1,66 @@
 # Outlier Detection Methods Are Not Equally Resilient to Sampling
 
-Outlier detection is rarely run on a complete dataset — it is applied to *samples*
-(survey responses, database subsets, materialised views, streaming windows). This
-project defines and measures **resilience to sampling**: how consistently a detector
-flags the *same* records on a subsample as it would on the full dataset, under simple
-random sampling without replacement (SRSWOR), stratified, and cluster designs.
+Outlier detection is often run on a random sample of a dataset because the full dataset is too large
+for the detector. This repository measures **resilience to sampling**: how much the records a detector
+flags on a simple random sample (without replacement) agree with those it flags on the full dataset.
+Both measures are label-free:
 
-Two complementary, label-free metrics are used: **Dice resilience** (ρ, set-overlap)
-and **rank resilience** (ρ̃, Spearman correlation of score vectors). Seven experiments
-(E1–E7) validate a four-class theory across **18 detectors** and **16 datasets**
-(up to 286,048 records).
+- **ρ (Dice resilience):** overlap of the top-K records of the sample under the sample fit and under the
+  full-data fit (K = ⌊qn⌋, q = 10%); with ties at the cut-off, the expected overlap when tied records are
+  chosen at random, independently for the two fits;
+- **ρ̃ (rank resilience):** Spearman correlation of the two score vectors on the sample.
 
-**Headline result:** at a 10% sampling fraction, local-density detectors (Class IV)
-show **3.2× higher output divergence** (1−ρ̄ = 0.46 vs 0.14) than moment-based detectors
-(Class I); Kruskal–Wallis H = 3142.7, p < 0.001 — confirming the theoretical class ordering.
+The code, raw results of every replicate, and scripts that produce every table and figure of the paper
+are in **`revision/`**. The folders `scripts/`, `results/`, `tables/` and `figures/` hold an earlier
+version of the pipeline, kept for reference: `scripts/data_loader.py` is still used to load the data,
+and `scripts/method_wrappers.py` is the earlier set of detector implementations that
+`revision/code/validate_reimplementations.py` compares with the reference implementations.
 
 > **Status:** manuscript under review (2026).
 
 ---
 
-## The four resilience classes (18 detectors)
+## Classes of detectors (18 detectors)
 
-| Class | Statistical object | Bound | Detectors |
-|-------|--------------------|-------|-----------|
-| **I — Moment-based** | sample moments | CLT, O(1/√n) | 3Sigma, BoxPlot, MAD, ChiSquare |
-| **II — Empirical-CDF** | empirical CDF | DKW (exponential) | COPOD, ECOD, HBOS |
-| **III — Isolation** | internal subsample (ψ=256) | intrinsic, O(1/√T) | IForest, **EIF** |
-| **IV — Local-density** | k-NN neighbourhood graph | hypergeometric, Ω(1/√(kp)) | LOF, KNN, OCSVM, Mahalanobis, KMeans, **ROD**, **ABOD**, **FeatureBagging**, **ADOD** |
+| Class | What the score depends on | Detectors |
+|-------|---------------------------|-----------|
+| **I** | global location and scale statistics | 3σ, BoxPlot, MAD, χ², Mahalanobis, ROD |
+| **II** | empirical CDFs (tail probabilities, histograms) | COPOD, ECOD, HBOS |
+| **III** | ensembles grown on internal subsamples (ψ = 256) | Isolation Forest, Extended Isolation Forest |
+| **IV** | the k-nearest-neighbour graph | LOF, KNN, ABOD, Feature Bagging, ADOD |
+| **G** | a globally fitted model (not assigned to a class) | k-means scoring, one-class SVM |
 
-The five newly added comparative baselines (bold) are:
-**EIF** — Extended Isolation Forest (Hariri et al., IEEE TKDE 2021);
-**ROD** — Rotation-based Outlier Detection (Almardeny et al., IEEE TKDE 2020);
-**ABOD** — Angle-Based Outlier Detection (Kriegel et al., KDD 2008);
-**Feature Bagging** (Lazarevic & Kumar, KDD 2005);
-**ADOD** — Adaptive Density Outlier Detection (Qian et al., IEEE ICDM 2024).
+Implementations (`revision/code/detectors_v2.py`): PyOD 0.9.9 (COPOD, ECOD, HBOS, KNN, ABOD,
+Feature Bagging, ROD), scikit-learn (LOF, one-class SVM, Isolation Forest, Mahalanobis), isotree
+(Extended Isolation Forest), and a CPU port of the authors' ADOD code
+(https://github.com/Qian-Lily/ADOD; exact nearest-neighbour search in place of the GPU index).
+3σ, BoxPlot, MAD, χ² and k-means scoring are implemented from their definitions.
 
-> AutoEncoder is implemented but disabled when `torch` is unavailable; the benchmark
-> uses the 18 detectors above.
-
----
-
-## Repository Structure
+## Repository structure
 
 ```
-OD_resilience_analysis/
-├── scripts/
-│   ├── data_loader.py         ADBench dataset loader (package or .npz fallback)
-│   ├── method_wrappers.py     18 detector wrappers (common fit / decision_function interface)
-│   ├── resilience_metrics.py  Dice (rho) and rank (rho_tilde) metrics
-│   ├── exp_E1_class_partition.py   E1: class-partition hypothesis (Kruskal–Wallis)
-│   ├── exp_E1b_multirate.py        E1b: multi-sampling-rate table (p = 1/5/10%)
-│   ├── exp_E2_convergence.py       E2: convergence rate + IForest phase transition
-│   ├── exp_E3_lof_kdep.py          E3: LOF/KNN k-dependence (Ω(1/√(kp)))
-│   ├── exp_E4_rankbased.py         E4: rank-based (ρ̃) vs Dice (ρ) resilience
-│   ├── exp_E5_largescale.py        E5: large-scale (3 largest datasets) + runtime
-│   ├── exp_E6_stratified.py        E6: stratified vs SRSWOR
-│   ├── exp_E7_cluster.py           E7: cluster sampling
-│   ├── plot_E*.py / table_E*.py    Figures and LaTeX tables
-│   ├── run_all.sh                  Run E1–E7 sequentially
-│   └── run_exp_E{1-6}.sh           Per-experiment shell wrappers
-├── results/                   Pre-computed CSVs (one per experiment, 18-detector run)
-├── figures/                   Generated figures (PDF/PNG)
-├── tables/                    Derived summary tables (CSV)
-├── data/                      Dataset directory (populated by download_datasets.py)
-├── download_datasets.py       Downloads ADBench .npz files
-├── setup_env.sh               cmake-free install for Python 3.13 / macOS
-├── requirements.txt           Loose version pins
-├── requirements-lock.txt      Exact pinned versions
-├── CITATION.cff               Machine-readable citation metadata
-└── README.md                  This file
+revision/
+├── code/
+│   ├── detectors_v2.py              the 18 detectors (in-sample scores)
+│   ├── datasets_v2.py               datasets, size tiers, synthetic data (E7, E8)
+│   ├── run_resilience.py            one runner for every experiment:  exp=E1 | E1b | E2 | E2b1000 |
+│   │                                E2b2000 | E2b5000 | E3 | E5 | X5 (paper E6) | X6 (E7) | X7 (E8)
+│   ├── analyze_E1.py, analyze_rest.py   every table and number of the Results
+│   ├── plot_fig1.py, plot_fig2.py        Figs 1 and 2
+│   ├── make_si_tables.py                 S1–S3 Tables
+│   ├── validate_reimplementations.py     ADOD port vs authors' code; earlier vs reference implementations
+│   ├── eif_direction_check.py            score direction of the earlier EIF implementation
+│   ├── time_runtime.py                   runtimes for E5 (run on an idle machine)
+│   ├── download_extra_datasets.py        13 extra datasets for E2 (pinned ODDS/ADBench copies)
+│   └── inventory.py                      completeness check of the results tree
+├── experiments/<exp>/raw/*.csv      one row per replicate (dataset × method × condition)
+├── experiments/<exp>/tables/        derived tables (CSV and LaTeX fragments)
+├── experiments/validation/          implementation checks
+├── SI/                              S1–S3 Tables (CSV)
+├── figures/                         Fig1.tif, Fig2.tif
+└── run_all.sh                       re-runs everything (resumable)
+scripts/, results/, tables/, figures/   earlier version of the pipeline (see above)
+data/                                datasets (downloaded, not versioned)
 ```
 
 ---
@@ -137,42 +129,29 @@ Substitutions vs. the original plan (ADBench availability): `vertebral` for arrh
 
 ---
 
-## Reproducing the Experiments
+## Reproducing the paper
+
+All experiments run on a CPU (the paper used one laptop, Intel Core i9-9980HK, 64 GB, no GPU).
 
 ```bash
-cd scripts/
-bash run_all.sh              # E1–E7 sequentially
-bash run_all.sh --skip-e5    # skip large-scale E5
-bash run_all.sh --dry-run    # print plan, no execution
+python download_datasets.py                                  # 16 core datasets into data/
+.venv/bin/pip install hydra-core omegaconf statsmodels scikit-posthocs isotree
+.venv/bin/pip install combo --no-deps                        # needed by PyOD's Feature Bagging
+bash revision/run_all.sh                                     # all experiments, tables, figures, SI
 ```
 
-Individual experiments (write CSVs to `results/`, figures to `figures/`):
+`run_all.sh` is resumable: a (dataset, method) unit is skipped when its CSV already holds the expected
+number of replicates. With the result files included in this repository, the analysis steps alone
+(`analyze_E1.py`, `analyze_rest.py`, `make_si_tables.py`, `plot_fig*.py`) reproduce every table and
+figure in minutes. Datasets with more than 5,000 records are represented in E1–E4 and E6–E8 by one fixed
+random subset of 5,000 records; E5 uses the full datasets.
+
+To check the ADOD implementation against the authors' code:
 
 ```bash
-python exp_E1_class_partition.py   # E1: 18 methods × 16 datasets × 50 reps (Kruskal–Wallis)
-python exp_E1b_multirate.py        # E1b: p in {1,5,10}% class means
-python exp_E2_convergence.py       # E2: convergence exponents + IForest phase transition
-python exp_E3_lof_kdep.py          # E3: LOF/KNN k-dependence
-python exp_E4_rankbased.py         # E4: rho_tilde >= rho (15/18 methods), threshold sensitivity
-python exp_E5_largescale.py        # E5: 3 largest datasets + runtime speedups
-python exp_E6_stratified.py        # E6: stratified vs SRSWOR
-python exp_E7_cluster.py           # E7: cluster sampling
+git clone https://github.com/Qian-Lily/ADOD external/ADOD
+.venv/bin/python revision/code/validate_reimplementations.py
 ```
-
-Approximate total runtime ~8–24 h on a MacBook Pro (Apple M2, 16 GB); E1b and E5
-dominate because the new EIF/ROD/ADOD detectors are compute-intensive at scale.
-
----
-
-## Key Results
-
-- **E1** — Class ordering confirmed: mean 1−ρ̄ at p=10% is 0.14 (I), 0.23 (II), 0.28 (III),
-  0.46 (IV); Kruskal–Wallis H = 3142.7, p < 0.001.
-- **E1b** — Ordering holds at every sampling fraction (p = 1/5/10%).
-- **E4** — ρ̃ ≥ ρ for **15 of 18** methods (Wilcoxon, p < 0.05); the rank metric is
-  threshold-free. Exceptions: LOF, ADOD (rank also degrades), BoxPlot (n.s.).
-- **E5** — Ordering holds at scale (N up to 286K); IForest ρ ≈ 0.88 at p=1%;
-  sampling gives ×1.7–×10.5 runtime speedups with negligible resilience loss.
 
 ---
 
@@ -180,10 +159,10 @@ dominate because the new EIF/ROD/ADOD detectors are compute-intensive at scale.
 
 This repository is the data-availability record for the paper.
 
-- **Derived data** (the per-condition resilience results underlying every table/figure):
-  `results/*.csv` and `tables/*.csv` — included here, regenerated deterministically
-  (fixed seeds) by `scripts/`.
-- **Benchmark datasets** (16): existing public third-party data from
+- **Derived data** (the per-replicate resilience results underlying every table and figure of the
+  paper): `revision/experiments/*/raw/*.csv`, with derived tables in `revision/experiments/*/tables/`,
+  regenerated deterministically (fixed seeds) by `revision/code/`.
+- **Benchmark datasets** (16 core datasets, plus 13 used only in E2): existing public third-party data from
   [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`);
   fetch with `python download_datasets.py`. Full-scale Covertype/Skin also at the
   [UCI ML Repository](https://archive.ics.uci.edu/).
