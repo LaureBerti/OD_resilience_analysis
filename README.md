@@ -51,6 +51,7 @@ revision/
 │   ├── validate_reimplementations.py     ADOD port vs authors' code; earlier vs reference implementations
 │   ├── eif_direction_check.py            score direction of the earlier EIF implementation
 │   ├── time_runtime.py                   runtimes for E5 (run on an idle machine)
+│   ├── oblique_variance.py               per-tree depth variance, axis-parallel vs oblique trees
 │   ├── download_extra_datasets.py        13 extra datasets for E2 (pinned ODDS/ADBench copies)
 │   └── inventory.py                      completeness check of the results tree
 ├── experiments/<exp>/raw/*.csv      one row per replicate (dataset × method × condition)
