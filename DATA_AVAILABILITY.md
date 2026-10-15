@@ -95,8 +95,8 @@ The concept DOI below always resolves to the latest version; each version also h
 
 > **Concept DOI (all versions):** [10.5281/zenodo.20829792](https://doi.org/10.5281/zenodo.20829792)
 
-The repository is linked to Zenodo via GitHub, so each new GitHub release on
-`LaureBerti/OD_resilience_analysis` automatically mints a new version DOI under this concept DOI.
+New versions are deposited on Zenodo as new versions of this record, so they share the concept
+DOI above; each version also receives its own DOI.
 
 ## License
 
