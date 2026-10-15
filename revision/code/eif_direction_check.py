@@ -20,7 +20,7 @@ HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE))
-from datasets_v2 import _legacy_scripts  # noqa: E402
+from datasets_v2 import _legacy_scripts
 sys.path.insert(0, str(_legacy_scripts(PROJECT)))
 
 

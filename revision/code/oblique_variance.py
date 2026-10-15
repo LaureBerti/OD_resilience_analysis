@@ -1,11 +1,12 @@
 """oblique_variance.py — per-tree depth variance of axis-parallel vs oblique (fully extended) isolation trees.
 
-Tests the stylized derivation (S1 Appendix, Lemma S3): under independent per-split separation with
-equal feature ranges, Var_oblique / Var_axis ~ (pi/2) s^2 and E-depth ratio ~ sqrt(pi/2) s, where
-s = ||delta||_1 / (sqrt(d) ||delta||_2) and delta = x - (coordinate-wise median), features min-max scaled.
+Tests the stylized derivation (S1 Appendix, Lemma S4): under independent per-split separation with
+equal feature ranges, Var_oblique / Var_axis = s^2 / (d c_d^2) (about (pi/2) s^2 for large d), where
+c_d = E|u_1| for u uniform on the unit sphere, s = ||delta||_1 / (sqrt(d) ||delta||_2) and
+delta = x - (coordinate-wise median), features min-max scaled.
 Both forests use the SAME subsamples (psi = 256) for every tree, so only the split rule differs.
 Records analysed: those near the flagging threshold (mean-depth rank between 8% and 12% under the
-axis-parallel forest, i.e. around the top-10% cut). Output: revision/experiments/E6b/*.csv
+axis-parallel forest, i.e. around the top-10% cut). Output: revision/experiments/E6b/{per_record,summary,correlations}.csv
 Run: .venv/bin/python revision/code/oblique_variance.py
 """
 from __future__ import annotations
@@ -18,6 +19,8 @@ import hydra
 import numpy as np
 import pandas as pd
 from hydra.core.config_store import ConfigStore
+from scipy import stats
+from scipy.special import gammaln
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
@@ -55,6 +58,10 @@ def build(X, depth, limit, oblique, rng):
     return ("split", w, c, build(X[m], depth + 1, limit, oblique, rng), build(X[~m], depth + 1, limit, oblique, rng))
 
 
+def c_d(d):
+    return np.exp(gammaln(d / 2) - gammaln((d + 1) / 2)) / np.sqrt(np.pi)
+
+
 def cfac(n):
     return 0.0 if n <= 1 else 1.0 if n == 2 else 2.0 * (np.log(n - 1) + 0.5772156649) - 2.0 * (n - 1) / n
 
@@ -81,17 +88,17 @@ def main(c: Cfg) -> None:
     for name in c.datasets:
         X, _, _ = DS.load(name, c.n_cap, c.seed)
         X = X[:, X.std(0) > 0]
-        X = (X - X.min(0)) / (X.max(0) - X.min(0))                  # equal feature ranges
+        X = (X - X.min(0)) / (X.max(0) - X.min(0))
         n, d = X.shape
         rng = np.random.default_rng(c.seed)
         limit = int(np.ceil(np.log2(c.psi)))
         Dax = np.empty((c.n_trees, n)); Dob = np.empty((c.n_trees, n))
         for t in range(c.n_trees):
-            idx = rng.choice(n, size=min(c.psi, n), replace=False)   # same subsample for both rules
+            idx = rng.choice(n, size=min(c.psi, n), replace=False)
             Dax[t] = depths(X, build(X[idx], 0, limit, False, np.random.default_rng(c.seed + 10 * t)))
             Dob[t] = depths(X, build(X[idx], 0, limit, True, np.random.default_rng(c.seed + 10 * t + 1)))
         mean_ax = Dax.mean(0)
-        order = np.argsort(mean_ax)                                  # smallest depth = most anomalous
+        order = np.argsort(mean_ax)
         lo_i, hi_i = int(c.band[0] * n), int(c.band[1] * n)
         band = order[lo_i:hi_i]
         delta = X - np.median(X, 0)
@@ -102,13 +109,21 @@ def main(c: Cfg) -> None:
         print(name, d, len(band), flush=True)
     df = pd.DataFrame(rows)
     df["ratio_var"] = df.var_ob / df.var_ax
-    df["pred_var"] = (np.pi / 2) * df.s ** 2
+    df["pred_var"] = df.s ** 2 / (df.d * c_d(df.d) ** 2)
     df.to_csv(out / "per_record.csv", index=False)
     summ = df.groupby(["dataset", "d"]).agg(records=("record", "size"), s_median=("s", "median"),
                                             var_ratio_median=("ratio_var", "median"),
                                             pred_median=("pred_var", "median")).reset_index()
+    summ["obs_over_pred"] = summ.var_ratio_median / summ.pred_median
     summ.to_csv(out / "summary.csv", index=False)
+    cor = []
+    for grp, sub in [("d<=9", df[df.d <= 9]), ("d>=16", df[df.d >= 16])]:
+        r = stats.spearmanr(sub.s, sub.ratio_var)
+        cor.append(dict(group=grp, records=len(sub), datasets=sub.dataset.nunique(),
+                        spearman_s_vs_ratio=r.statistic, p=r.pvalue))
+    pd.DataFrame(cor).to_csv(out / "correlations.csv", index=False)
     print(summ.round(3).to_string())
+    print(pd.DataFrame(cor).round(3).to_string())
 
 
 if __name__ == "__main__":

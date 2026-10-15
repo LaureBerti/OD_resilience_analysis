@@ -50,26 +50,25 @@ HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 
-import detectors_v2 as D  # noqa: E402
-import datasets_v2 as DS  # noqa: E402
+import detectors_v2 as D
+import datasets_v2 as DS
 
 THRESHOLDS = (0.05, 0.08, 0.10, 0.12, 0.15)
 
 
-# ------------------------------------------------------------------ config
 @dataclass
 class RunConfig:
     exp: str = "E1"
-    methods: list = field(default_factory=list)      # empty -> experiment default
-    datasets: list = field(default_factory=list)     # empty -> experiment default
-    ps: list = field(default_factory=list)           # empty -> experiment default
-    n_reps: int = 0                                  # 0 -> experiment default
-    n_cap: int = -1                                  # -1 -> experiment default; 0 = no cap
-    q: float = 0.10                                  # flagged fraction for rho
+    methods: list = field(default_factory=list)
+    datasets: list = field(default_factory=list)
+    ps: list = field(default_factory=list)
+    n_reps: int = 0
+    n_cap: int = -1
+    q: float = 0.10
     n_jobs: int = 12
     base_seed: int = 42
     out_root: str = "revision/experiments"
-    variants: list = field(default_factory=list)     # method kwargs variants, e.g. ['n_estimators=500']
+    variants: list = field(default_factory=list)
 
 
 @dataclass
@@ -82,38 +81,29 @@ ConfigStore.instance().store(name="run", node=Root)
 
 ALL16 = DS.CORE_DATASETS
 EXPERIMENTS = {
-    # E1: class partition; also gives E4 (rho vs rho_tilde, thresholds) for every method
     "E1": dict(methods=D.ALL_METHODS, datasets=ALL16, ps=[0.10], n_reps=50, n_cap=5000),
-    # E1b: several sampling rates
     "E1b": dict(methods=D.ALL_METHODS, datasets=ALL16, ps=[0.01, 0.05, 0.10], n_reps=20, n_cap=5000),
-    # E2: convergence in n on >= 20 datasets with N >= 1000
     "E2": dict(methods=["ThreeSigma", "MAD", "COPOD", "ECOD", "IForest", "EIF", "LOF", "KNN"],
                datasets=DS.E2_DATASETS, ps=[0.005, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20, 0.30, 0.50],
                n_reps=30, n_cap=5000),
-    # E2b: separate n from p — same p, reference sets of different size N (datasets with N >= 5000)
     **{f"E2b{Nr}": dict(methods=["ThreeSigma", "MAD", "COPOD", "ECOD", "IForest", "LOF", "KNN", "ABOD"],
                         datasets=["optdigits", "satellite", "pendigits", "annthyroid", "shuttle", "smtp", "skin",
                                   "covertype", "pageblocks", "satimage2", "mnist", "mammography", "magic_gamma",
                                   "campaign", "celeba", "fraud", "http"],
                         ps=[0.05, 0.10, 0.20], n_reps=30, n_cap=Nr) for Nr in (1000, 2000, 5000)},
-    # E3: LOF / KNN neighbourhood size (variants k)
     "E3": dict(methods=["LOF", "KNN"], datasets=["annthyroid", "glass", "letter", "lympho", "optdigits",
                                                    "skin", "smtp", "thyroid"],
                ps=[0.05, 0.10, 0.20], n_reps=30, n_cap=5000,
                variants=[f"n_neighbors={k}" for k in (3, 5, 10, 15, 20)]),
-    # E5: full-scale datasets, global and ensemble methods, runtime
     "E5": dict(methods=["ThreeSigma", "BoxPlot", "MAD", "ChiSquare", "Mahalanobis", "COPOD", "ECOD",
                         "HBOS", "IForest", "EIF"],
                datasets=["covertype", "skin", "smtp"], ps=[0.01, 0.05, 0.10], n_reps=10, n_cap=0),
-    # X5: ensemble size for IForest and EIF
     "X5": dict(methods=["IForest", "EIF"], datasets=["letter", "thyroid", "optdigits", "satellite",
                                                      "pendigits", "annthyroid", "shuttle", "smtp"],
                ps=[0.10], n_reps=20, n_cap=5000,
                variants=[f"n_estimators={t}" for t in (50, 100, 200, 500, 1000)]),
-    # X6: dimension study on synthetic Gaussian data
     "X6": dict(methods=D.ALL_METHODS, datasets=[f"gauss_d{d}" for d in (2, 10, 50, 100)],
                ps=[0.10], n_reps=30, n_cap=0),
-    # X7: anomaly types (ADBench-style generator)
     "X7": dict(methods=D.ALL_METHODS,
                datasets=[f"{t}_{b}" for t in ("local", "global", "clustered")
                          for b in ("annthyroid", "pendigits", "satellite", "thyroid")],
@@ -121,7 +111,6 @@ EXPERIMENTS = {
 }
 
 
-# ------------------------------------------------------------------ metrics
 def topk(s: np.ndarray, k: int) -> np.ndarray:
     """Probability that each record is among the top-k when ties at the k-th value are broken uniformly
     at random: 1 above the k-th value, (k - #above) / #tied at it, 0 below."""
@@ -185,7 +174,6 @@ def metrics(s_S, s_DS, s_D, idx, q, N):
     return out
 
 
-# ------------------------------------------------------------------ one unit
 def parse_variant(v: str) -> dict:
     if not v:
         return {}
@@ -246,7 +234,6 @@ def run_unit(exp, ds, m, variant, ps, n_reps, n_cap, q, base_seed, root):
                 row["degenerate"] = np.nan
             rows.append(row)
     df = pd.DataFrame(rows)
-    # abort-loud: a unit whose every replicate errored is not written as "done"
     if (df["error"] != "").all():
         path.with_suffix(".FAILED.txt").write_text(df["error"].iloc[0])
         return f"FAILED {path.name}: {df['error'].iloc[0]}"
@@ -275,7 +262,6 @@ def main(cfg: Root) -> None:
     (root / f"config_{time.strftime('%Y%m%d_%H%M%S')}.yaml").write_text(OmegaConf.to_yaml(cfg))
     units = [(exp, ds, m, v, ps, n_reps, n_cap, c.q, c.base_seed, root)
              for ds in datasets for m in methods for v in variants]
-    # first-unit guard: run one unit in-process and abort if it produced nothing usable
     first = run_unit(*units[0])
     print(first, flush=True)
     if first.startswith("FAILED"):

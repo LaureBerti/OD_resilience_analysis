@@ -7,7 +7,7 @@
     implementations now used (detectors_v2), on the in-sample scores of each dataset.
 
 Output: revision/experiments/validation/reimpl_validation.csv (+ .md). CPU-only.
-Run: .venv/bin/python revision/code/validate_reimplementations.py [val.datasets='[glass,vertebral]']
+Run: .venv/bin/python revision/code/validate_reimplementations.py [val.datasets='[glass,vertebral]'] [val.adod_only=true]
 """
 from __future__ import annotations
 
@@ -27,15 +27,17 @@ HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE))
-from datasets_v2 import _legacy_scripts  # noqa: E402
+from datasets_v2 import _legacy_scripts
 sys.path.insert(0, str(_legacy_scripts(PROJECT)))
 
 
 @dataclass
 class ValConfig:
-    adod_repo: str = "external/ADOD"   # git clone https://github.com/Qian-Lily/ADOD external/ADOD (commit dc76889)
+    adod_repo: str = "external/ADOD"
     adod_datasets: list = field(default_factory=lambda: ["lympho", "glass", "vertebral", "ionosphere", "breastw"])
-    adod_extra_subsample: int = 1000   # also check annthyroid on a 1,000-record draw
+    adod_extra_subsample: int = 1000
+    adod_large: list = field(default_factory=lambda: ["annthyroid", "pendigits", "satellite"])
+    adod_only: bool = False
     datasets: list = field(default_factory=lambda: ["lympho", "glass", "vertebral", "ionosphere", "breastw",
                                                     "letter", "thyroid", "annthyroid", "pendigits", "satellite",
                                                     "shuttle", "smtp", "skin", "covertype", "musk", "optdigits"])
@@ -75,7 +77,7 @@ def original_adod_scores(X, repo):
     perp = int(np.sqrt(n)) * 2
     k = min(n, 3 * perp, 2048)
     d, idx = NearestNeighbors(n_neighbors=k).fit(X).kneighbors(X)
-    sq = (d ** 2).astype(np.float32)                  # FAISS flat L2 returns squared distances
+    sq = (d ** 2).astype(np.float32)
     sigma = A.binary_search_perplexity_knn(sq, perp)
     kd = np.sqrt(sq)
     b = st.norm.ppf(0.999, loc=0, scale=sigma)
@@ -101,8 +103,8 @@ def main(cfg: Root) -> None:
     out = PROJECT / c.out_dir
     out.mkdir(parents=True, exist_ok=True)
     rows = []
-    # (a) ADOD port vs original code
-    todo = [(n, None) for n in c.adod_datasets] + [("annthyroid", c.adod_extra_subsample)]
+    todo = ([(n, None) for n in c.adod_datasets] + [("annthyroid", c.adod_extra_subsample)]
+            + [(n, c.n_cap) for n in c.adod_large])
     for name, sub in todo:
         X, _ = load(name, sub or c.n_cap, c.seed)
         repo = Path(c.adod_repo) if Path(c.adod_repo).is_absolute() else PROJECT / c.adod_repo
@@ -113,7 +115,12 @@ def main(cfg: Root) -> None:
                          spearman=r, top10_overlap=top, max_abs_diff=float(np.max(np.abs(ours - ref))),
                          std_new=sa, std_ref=sb, t_ref_s=t_ref, t_new_s=t_ours))
         print(rows[-1], flush=True)
-    # (b) submitted wrappers vs reference in-sample scores
+    if c.adod_only:
+        prev = pd.read_csv(out / "reimpl_validation.csv")
+        df = pd.concat([pd.DataFrame(rows), prev[prev.check != "ADOD port vs original adod.py"]], ignore_index=True)
+        df.to_csv(out / "reimpl_validation.csv", index=False)
+        print(f"wrote {out/'reimpl_validation.csv'} (ADOD rows replaced)")
+        return
     pairs = ["ADOD", "EIF", "ABOD", "FeatureBagging", "HBOS", "Mahalanobis", "LOF", "KNN", "IForest",
              "ROD", "OCSVM", "COPOD", "ECOD"]
     for name in c.datasets:

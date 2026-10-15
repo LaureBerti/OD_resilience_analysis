@@ -11,10 +11,11 @@ Both measures are label-free:
 - **ρ̃ (rank resilience):** Spearman correlation of the two score vectors on the sample.
 
 The code, raw results of every replicate, and scripts that produce every table and figure of the paper
-are in **`revision/`**. The folders `scripts/`, `results/`, `tables/` and `figures/` hold an earlier
-version of the pipeline, kept for reference: `scripts/data_loader.py` is still used to load the data,
-and `scripts/method_wrappers.py` is the earlier set of detector implementations that
-`revision/code/validate_reimplementations.py` compares with the reference implementations.
+are in **`revision/`**. `scripts/` holds two files of an earlier version that are still used:
+`scripts/data_loader.py` loads the data, and `scripts/method_wrappers.py` is the earlier set of detector
+implementations that `revision/code/validate_reimplementations.py` compares with the reference
+implementations. Everything else from the earlier version (its scripts, results, tables and figures)
+is in `archive/submitted_version/`; it is superseded and does not underlie the paper.
 
 > **Status:** manuscript under review (2026).
 
@@ -30,8 +31,9 @@ and `scripts/method_wrappers.py` is the earlier set of detector implementations 
 | **IV** | the k-nearest-neighbour graph | LOF, KNN, ABOD, Feature Bagging, ADOD |
 | **G** | a globally fitted model (not assigned to a class) | k-means scoring, one-class SVM |
 
-Implementations (`revision/code/detectors_v2.py`): PyOD 0.9.9 (COPOD, ECOD, HBOS, KNN, ABOD,
-Feature Bagging, ROD), scikit-learn (LOF, one-class SVM, Isolation Forest, Mahalanobis), isotree
+Implementations (`revision/code/detectors_v2.py`): PyOD 0.9.9 (COPOD, ECOD, HBOS, ABOD,
+Feature Bagging, ROD), scikit-learn (LOF, KNN with the PyOD definition, one-class SVM, Isolation Forest,
+Mahalanobis), isotree
 (Extended Isolation Forest), and a CPU port of the authors' ADOD code
 (https://github.com/Qian-Lily/ADOD; exact nearest-neighbour search in place of the GPU index).
 3σ, BoxPlot, MAD, χ² and k-means scoring are implemented from their definitions.
@@ -60,7 +62,8 @@ revision/
 ├── SI/                              S1–S3 Tables (CSV)
 ├── figures/                         Fig1.tif, Fig2.tif
 └── run_all.sh                       re-runs everything (resumable)
-scripts/, results/, tables/, figures/   earlier version of the pipeline (see above)
+scripts/                             data loader and earlier detector wrappers (see above)
+archive/submitted_version/           earlier version of the pipeline (superseded)
 data/                                datasets (downloaded, not versioned)
 ```
 
@@ -115,18 +118,19 @@ The 16 datasets, by size tier:
 
 | Tier | Datasets | N |
 |------|----------|---|
-| T1 (N < 1K) | vertebral, breastw, glass, lympho | 148–683 |
-| T2 (1K–10K) | annthyroid, ionosphere, letter, musk, optdigits, pendigits, satellite, thyroid | 1.6K–7.2K |
+| T1 (N < 1K) | lympho, glass, vertebral, ionosphere, breastw | 148–683 |
+| T2 (1K–10K) | letter, musk, thyroid, optdigits, satellite, pendigits, annthyroid | 1.6K–7.2K |
 | T3 (10K–100K) | shuttle, smtp | 49K–95K |
 | T4 (≥ 100K) | skin, covertype | 245K–286K |
 
 Substitutions vs. the original plan (ADBench availability): `vertebral` for arrhythmia;
 `smtp`/`skin`/full-scale `covertype` for the large-scale sets.
-**E1/E1b** use all 16; **E4** uses 13 (12 in the Part A rank test + Satellite in Part B);
-**E5** uses the three largest (covertype, skin, smtp).
+**E1, E1b and E4** use all 16; **E5** uses the three largest (covertype, skin, smtp) at full size;
+the other experiments are listed in Table 3 of the paper. **E2** also uses 13 further datasets
+(`python revision/code/download_extra_datasets.py`).
 
-> `data/*.npz` are git-ignored. Pre-computed `results/*.csv` let you reproduce the
-> tables/figures without re-running the experiments.
+> `data/*.npz` are git-ignored. The per-replicate results in `revision/experiments/*/raw/` let you
+> reproduce every table and figure without re-running the experiments.
 
 ---
 
@@ -147,7 +151,22 @@ number of replicates. With the result files included in this repository, the ana
 figure in minutes. Datasets with more than 5,000 records are represented in E1–E4 and E6–E8 by one fixed
 random subset of 5,000 records; E5 uses the full datasets.
 
-To check the ADOD implementation against the authors' code:
+Which script produces what (all read `revision/experiments/*/raw/` and write `revision/experiments/*/tables/`):
+
+| Paper item | Script | Output |
+|------------|--------|--------|
+| Table 6 (E1 by tier), Table 7 (E4), E1 tests (Friedman, Wilcoxon–Holm, mixed model), S2 Table data | `revision/code/analyze_E1.py` | `E1/tables/` |
+| E1b, E2 rates, Table 8 (E2b), E3, Table 9 (E5), the values of Table 10 (E6), E7, E8 | `revision/code/analyze_rest.py` | `E1b/`, `E2/`, `E2b5000/`, `E3/`, `E5/`, `X5/`, `X6/`, `X7/` `tables/` |
+| E6, oblique-split check | `revision/code/oblique_variance.py` | `E6b/` |
+| Fig 1, Fig 2 | `revision/code/plot_fig1.py`, `plot_fig2.py` | `revision/figures/` |
+| S1–S3 Tables, Table R1 of the response letter | `revision/code/make_si_tables.py` | `revision/SI/`, `validation/implementations_vs_reference.csv` |
+| S1 Table data (ADOD port vs authors' code), Table R1 data | `revision/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
+| E5 runtimes | `revision/code/time_runtime.py` | `E5/tables/runtime_idle.csv` |
+
+Tables 1–5 (notation, classes, experiments, datasets, methods) are written by hand.
+
+To check the ADOD implementation against the authors' code (also run by `run_all.sh` if
+`external/ADOD` exists):
 
 ```bash
 git clone https://github.com/Qian-Lily/ADOD external/ADOD
@@ -167,9 +186,9 @@ This repository is the data-availability record for the paper.
   [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`);
   fetch with `python download_datasets.py`. Full-scale Covertype/Skin also at the
   [UCI ML Repository](https://archive.ics.uci.edu/).
-- **Persistent identifier:** this repository is archived on
-  [Zenodo](https://doi.org/10.5281/zenodo.20829793) with DOI
-  **`10.5281/zenodo.20829793`** — the citable, long-term record required by PLOS
+- **Persistent identifier:** this repository is archived on Zenodo; the concept DOI
+  **`10.5281/zenodo.20829792`** (https://doi.org/10.5281/zenodo.20829792) resolves to the latest
+  version, and each version also has its own DOI.
 
 
 >  The benchmark datasets are already public via ADBench/UCI.

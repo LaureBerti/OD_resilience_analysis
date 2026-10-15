@@ -10,11 +10,11 @@ authors:
   - family-names: Loh
     given-names: Ji Meng
 repository-code: "https://github.com/LaureBerti/OD_resilience_analysis"
-doi: "10.5281/zenodo.20829793"
+doi: "10.5281/zenodo.20829792"
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.20829793"
-    description: "Zenodo archive of this repository (concept DOI)"
+    value: "10.5281/zenodo.20829792"
+    description: "Zenodo archive of this repository (concept DOI, all versions)"
 license: MIT
 version: "2.0.0"
 date-released: "2026-06-12"

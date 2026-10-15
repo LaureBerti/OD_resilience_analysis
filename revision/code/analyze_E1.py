@@ -27,7 +27,7 @@ from scipy import stats
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
-import detectors_v2 as D  # noqa: E402
+import detectors_v2 as D
 
 CLASSES = ["I", "II", "III", "IV"]
 ORDER = ["ThreeSigma", "BoxPlot", "MAD", "ChiSquare", "Mahalanobis", "ROD", "COPOD", "ECOD", "HBOS",
@@ -65,11 +65,9 @@ def main(c: Cfg) -> None:
     print("units:", len(comp), " incomplete:", int((~comp.complete).sum()),
           " with degenerate reps:", int((comp.degenerate > 0).sum()), " with errors:", int((comp.errors > 0).sum()))
 
-    # dataset-level means (unit of analysis)
     dm = df.groupby(["dataset", "tier", "method", "method_class"], as_index=False)[
         ["rho", "rho_tilde", "rho_adapt", "rho_def1"] + [f"rho_k{t}" for t in (5, 8, 10, 12, 15)]].mean()
 
-    # Table: mean ± sd over datasets of per-dataset means, per tier and All
     rows = []
     for m in ORDER:
         r = {"class": D.METHOD_CLASS[m], "method": m}
@@ -79,7 +77,7 @@ def main(c: Cfg) -> None:
         rows.append(r)
     tab = pd.DataFrame(rows)
     for cl in CLASSES + ["G"]:
-        r = {"class": cl, "method": f"Class {cl} mean"}
+        r = {"class": cl, "method": "Group G mean" if cl == "G" else f"Class {cl} mean"}
         for t in ["T1", "T2", "T3", "T4", "All"]:
             x = dm[(dm.method_class == cl) & ((dm.tier == t) if t != "All" else True)]
             s = x.groupby("dataset")["rho"].mean()
@@ -94,7 +92,6 @@ def main(c: Cfg) -> None:
                                for t in ["T1", "T2", "T3", "T4", "All"])
             f.write(f"{r['class']} & {r['method']} & {cells} \\\\\n")
 
-    # class means per dataset, tests
     cm = dm[dm.method_class.isin(CLASSES)].groupby(["dataset", "method_class"])["rho"].mean().unstack()
     cm.to_csv(out / "class_by_dataset.csv")
     cm = cm.dropna()
@@ -114,8 +111,9 @@ def main(c: Cfg) -> None:
     try:
         import statsmodels.formula.api as smf
         x = dm[dm.method_class.isin(CLASSES)].dropna(subset=["rho"]).copy()
-        md = smf.mixedlm("rho ~ C(method_class, Treatment('I'))", x, groups=x["dataset"],
-                         vc_formula={"method": "0 + C(method)"}).fit(reml=True)
+        x = x.reset_index(drop=True)
+        md = smf.mixedlm("rho ~ C(method_class, Treatment('I'))", x, groups=np.ones(len(x)),
+                         vc_formula={"dataset": "0 + C(dataset)", "method": "0 + C(method)"}).fit(reml=True)
         for name in md.params.index:
             if "method_class" in name:
                 tests.append(dict(test=f"Mixed model: {name} (random: dataset, method)", n_blocks=nb,
@@ -125,11 +123,10 @@ def main(c: Cfg) -> None:
         tests.append(dict(test=f"Mixed model failed: {e}"))
     pd.DataFrame(tests).to_csv(out / "tests.csv", index=False)
 
-    # E4: rho vs rho_tilde (dataset level)
     e4 = []
     for m in ORDER:
         s = dm[dm.method == m].dropna(subset=["rho", "rho_tilde"])
-        w = stats.wilcoxon(s.rho_tilde, s.rho, alternative="greater") if len(s) > 5 else None
+        w = stats.wilcoxon(s.rho_tilde, s.rho) if len(s) > 5 else None
         e4.append(dict(method=m, method_class=D.METHOD_CLASS[m], n_datasets=len(s), rho=s.rho.mean(),
                        rho_tilde=s.rho_tilde.mean(), diff=(s.rho_tilde - s.rho).mean(),
                        wilcoxon_p=w.pvalue if w else np.nan))
@@ -144,15 +141,14 @@ def main(c: Cfg) -> None:
     v["max_abs_diff_rho_adapt"] = dm.assign(d=(dm.rho - dm.rho_adapt).abs()).groupby("method").d.max().loc[ORDER]
     v.to_csv(out / "r2_variants.csv")
 
-    # LaTeX fragments used verbatim by the manuscript
     names = {"ThreeSigma": "$3\\sigma$", "ChiSquare": "$\\chi^2$", "FeatureBagging": "Feature Bagging",
              "KMeans": "$k$-means", "Mahalanobis": "Mahalanobis"}
     def cell(m, sd):
         return "---" if not np.isfinite(m) else f"{m:.2f}" + (f"$\\pm${sd:.2f}" if np.isfinite(sd) else "")
     lines = {"methods": [], "classes": []}
     for _, r in tab.iterrows():
-        key = "classes" if r["method"].startswith("Class ") else "methods"
-        nm = f"Class {r['class']} mean" if key == "classes" else names.get(r["method"], r["method"])
+        key = "classes" if r["method"].startswith(("Class ", "Group ")) else "methods"
+        nm = (("Group G mean" if r["class"] == "G" else f"Class {r['class']} mean") if key == "classes" else names.get(r["method"], r["method"]))
         lines[key].append(f"{r['class']} & {nm} & " + " & ".join(cell(r[f'{t}_mean'], r[f'{t}_sd'])
                                                                  for t in ["T1", "T2", "T3", "T4", "All"]) + " \\\\")
     for key, L in lines.items():

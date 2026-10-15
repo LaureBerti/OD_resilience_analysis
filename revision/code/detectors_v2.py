@@ -43,20 +43,19 @@ METHOD_CLASS = {
     "LOF": "IV", "KNN": "IV", "ABOD": "IV", "FeatureBagging": "IV", "ADOD": "IV",
     "KMeans": "G", "OCSVM": "G",
 }
-SUBMITTED_CLASS = {  # earlier taxonomy (kept only to compare with previous result files)
+SUBMITTED_CLASS = {
     "ThreeSigma": "I", "BoxPlot": "I", "MAD": "I", "ChiSquare": "I",
     "COPOD": "II", "ECOD": "II", "HBOS": "II", "IForest": "III", "EIF": "III",
     "LOF": "IV", "KNN": "IV", "OCSVM": "IV", "Mahalanobis": "IV", "KMeans": "IV",
     "ROD": "IV", "ABOD": "IV", "FeatureBagging": "IV", "ADOD": "IV",
 }
-STOCHASTIC = {"IForest", "EIF", "KMeans", "FeatureBagging"}  # score depends on the seed
+STOCHASTIC = {"IForest", "EIF", "KMeans", "FeatureBagging"}
 
 
 def _f(X):
     return np.ascontiguousarray(np.asarray(X, dtype=float))
 
 
-# ---------------------------------------------------------------- Class I (textbook rules)
 def three_sigma(X, seed=0, **kw):
     X = _f(X); s = X.std(0); s[s == 0] = 1e-10
     return np.max(np.abs(X - X.mean(0)) / s, axis=1)
@@ -95,7 +94,6 @@ def rod(X, seed=0, max_dim=5, **kw):
     return ROD().fit(X).decision_scores_
 
 
-# ---------------------------------------------------------------- Class II (PyOD)
 def _nonconstant(X):
     """COPOD and ECOD weight tails by the sign of each feature's skewness. For a feature that is
     constant in the training set, or nearly so (scipy then returns NaN to avoid precision loss), the
@@ -121,7 +119,6 @@ def hbos(X, seed=0, **kw):
     return HBOS().fit(_f(X)).decision_scores_
 
 
-# ---------------------------------------------------------------- Class III
 def iforest(X, seed=0, n_estimators=100, max_samples=256, **kw):
     from sklearn.ensemble import IsolationForest
     X = _f(X)
@@ -143,7 +140,6 @@ def eif(X, seed=0, n_estimators=200, max_samples=256, **kw):
     return m.predict(X, output="score")
 
 
-# ---------------------------------------------------------------- Class IV
 def lof(X, seed=0, n_neighbors=20, **kw):
     from sklearn.neighbors import LocalOutlierFactor
     X = _f(X)
@@ -169,7 +165,7 @@ def feature_bagging(X, seed=0, **kw):
     from pyod.models.feature_bagging import FeatureBagging
     X = _f(X)
     base = None
-    if len(X) <= 21:  # PyOD default base estimator LOF() uses n_neighbors=20; shrink only for tiny samples
+    if len(X) <= 21:
         from pyod.models.lof import LOF
         base = LOF(n_neighbors=max(1, len(X) - 2))
     return FeatureBagging(base_estimator=base, random_state=seed).fit(X).decision_scores_
@@ -189,8 +185,8 @@ def _adod_sigma(sq_d, perplexity, iters=50, tol=1e-5):
             Hd = H - logU
             done |= np.abs(Hd) <= tol
             act = ~done
-            up = act & (Hd > 0)          # entropy too high -> increase beta
-            dn = act & ~(Hd > 0)         # includes NaN, as in the original control flow
+            up = act & (Hd > 0)
+            dn = act & ~(Hd > 0)
             bmin[up] = beta[up]
             beta[up] = np.where(np.isinf(bmax[up]), beta[up] * 2.0, (beta[up] + bmax[up]) / 2.0)
             bmax[dn] = beta[dn]
@@ -208,7 +204,7 @@ def adod(X, seed=0, probability=0.999, perplexity=None, return_parts=False, **kw
     perp = int(np.sqrt(n)) * 2 if perplexity is None else perplexity
     k = min(n, 3 * perp, 2048)
     nn = NearestNeighbors(n_neighbors=k).fit(X)
-    dist, idx = nn.kneighbors(X)                    # self is column 0 (distance 0)
+    dist, idx = nn.kneighbors(X)
     sigma = _adod_sigma(dist[:, 1:] ** 2, perp)
     b = norm.ppf(probability, loc=0, scale=sigma)
     within = (dist <= b[:, None]) & (dist <= b[idx])
@@ -230,7 +226,6 @@ def adod(X, seed=0, probability=0.999, perplexity=None, return_parts=False, **kw
     return score
 
 
-# ---------------------------------------------------------------- global fitted models (G)
 def kmeans(X, seed=0, n_clusters=8, **kw):
     from sklearn.cluster import KMeans
     from sklearn.preprocessing import StandardScaler

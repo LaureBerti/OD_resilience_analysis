@@ -15,10 +15,10 @@ from pathlib import Path
 import hydra
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from hydra.core.config_store import ConfigStore  # noqa: E402
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from hydra.core.config_store import ConfigStore
 
 PROJECT = Path(__file__).resolve().parents[2]
 STYLE = {"ThreeSigma": ("3σ", "#0072B2", "-", "o"), "MAD": ("MAD", "#56B4E9", "--", "s"),
@@ -40,7 +40,7 @@ ConfigStore.instance().store(name="f2", node=Cfg)
 
 def summarise(g, col, bins):
     g = g.assign(nb=pd.cut(g.n, bins, labels=np.sqrt(bins[:-1] * bins[1:])))
-    g = g.groupby(["method", "nb", "dataset"], observed=True)[col].mean().reset_index()  # dataset first
+    g = g.groupby(["method", "nb", "dataset"], observed=True)[col].mean().reset_index()
     s = g.groupby(["method", "nb"], observed=True)[col].agg(
         med="median", lo=lambda x: x.quantile(0.25), hi=lambda x: x.quantile(0.75), k="count").reset_index()
     s["nb"] = s.nb.astype(float)

@@ -15,10 +15,10 @@ from pathlib import Path
 import hydra
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from hydra.core.config_store import ConfigStore  # noqa: E402
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from hydra.core.config_store import ConfigStore
 
 PROJECT = Path(__file__).resolve().parents[2]
 ORDER = ["I", "II", "III", "IV", "G"]
@@ -30,7 +30,7 @@ SHORT = {"ThreeSigma": "3σ", "BoxPlot": "Box", "MAD": "MAD", "ChiSquare": "χ²
          "ROD": "ROD", "COPOD": "COPOD", "ECOD": "ECOD", "HBOS": "HBOS", "IForest": "IF", "EIF": "EIF",
          "LOF": "LOF", "KNN": "KNN", "ABOD": "ABOD", "FeatureBagging": "FB", "ADOD": "ADOD",
          "KMeans": "k-m", "OCSVM": "OCSVM"}
-COLOR = {"I": "#0072B2", "II": "#009E73", "III": "#E69F00", "IV": "#D55E00", "G": "#7F7F7F"}  # Okabe-Ito
+COLOR = {"I": "#0072B2", "II": "#009E73", "III": "#E69F00", "IV": "#D55E00", "G": "#7F7F7F"}
 
 
 @dataclass
@@ -57,7 +57,7 @@ def main(c: Cfg) -> None:
     fig, (a, b) = plt.subplots(1, 2, figsize=(c.width_in, c.height_in),
                                gridspec_kw={"width_ratios": [1, 2.2], "wspace": 0.18})
     x = np.arange(len(ORDER))
-    for _, row in cm.iterrows():                      # paired lines, one per dataset
+    for _, row in cm.iterrows():
         a.plot(x[:4], row[ORDER[:4]].values, color="0.75", lw=0.5, zorder=1)
     bp = a.boxplot([cm[k].dropna() for k in ORDER], positions=x, widths=0.5, patch_artist=True,
                    whis=(0, 100), showfliers=False, medianprops=dict(color="black", lw=0.9), zorder=2)
@@ -81,7 +81,6 @@ def main(c: Cfg) -> None:
     b.set_xticks(ticks, labels, rotation=90)
     b.set_ylim(0, 1.02); b.set_yticklabels([]); b.set_xlim(-0.8, pos - 0.8)
     b.text(-0.01, 1.04, "B", transform=b.transAxes, fontweight="bold", fontsize=10, ha="right")
-    # class labels above panel B, placed in axes coordinates, clear of the data area
     start = 0.0
     for k in ORDER:
         n = len(METHODS[k]); mid = start + (n - 1) / 2
@@ -94,7 +93,7 @@ def main(c: Cfg) -> None:
     out = PROJECT / c.out_dir; out.mkdir(parents=True, exist_ok=True)
     fig.savefig(out / "Fig1.tif", dpi=c.dpi, bbox_inches="tight", pad_inches=0.05,
                 pil_kwargs={"compression": "tiff_lzw"})
-    from PIL import Image  # PLOS: RGB without alpha channel, LZW
+    from PIL import Image
     Image.open(out / "Fig1.tif").convert("RGB").save(out / "Fig1.tif", compression="tiff_lzw", dpi=(c.dpi, c.dpi))
     fig.savefig(out / "Fig1_preview.png", dpi=200, bbox_inches="tight", pad_inches=0.05)
     print(f"Fig1: {n_ds} datasets, {n_rep} replicates per (method, dataset)")

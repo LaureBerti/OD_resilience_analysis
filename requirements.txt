@@ -1,6 +1,5 @@
 # Requirements for outlier resilience experiments
-# Paper: Estimating the Resilience to Sampling of Outlier Detection Methods
-# Target: KAIS 2026
+# Paper: Outlier Detection Methods Are Not Equally Resilient to Sampling
 #
 # Python 3.13 / macOS note
 # ─────────────────────────────────────────────────────────────────────────────

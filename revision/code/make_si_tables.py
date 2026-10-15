@@ -20,7 +20,7 @@ HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 EXP = PROJECT / "revision" / "experiments"
 sys.path.insert(0, str(HERE))
-import datasets_v2 as DS  # noqa: E402
+import datasets_v2 as DS
 
 
 @dataclass
@@ -42,9 +42,12 @@ def main(c: Cfg) -> None:
     s1 = v[cols].rename(columns={"n": "records", "spearman": "spearman_rank_correlation",
                                  "top10_overlap": "overlap_of_top_10pct", "std_ref": "sd_scores_earlier_or_authors",
                                  "std_new": "sd_scores_reference_or_ours"})
-    # published S1 Table: our ADOD implementation vs the authors' code only
-    s1[s1.comparison.str.startswith("ADOD")].round(4).to_csv(out / "S1_Table.csv", index=False)
-    # earlier implementations vs reference implementations
+    a = v[v["check"] == "ADOD port vs original adod.py"]
+    a = a[["dataset", "n", "spearman", "top10_overlap", "max_abs_diff"]].rename(
+        columns={"n": "records", "spearman": "spearman_rank_correlation", "top10_overlap": "overlap_of_top_10pct",
+                 "max_abs_diff": "largest_absolute_score_difference"})
+    a["spearman_rank_correlation"] = a["spearman_rank_correlation"].round(4)
+    a.to_csv(out / "S1_Table.csv", index=False, float_format="%.4g")
     att = EXP / "validation"; att.mkdir(parents=True, exist_ok=True)
     r1 = s1[~s1.comparison.str.startswith("ADOD")]
     r1.round(4).to_csv(att / "implementations_vs_reference.csv", index=False)

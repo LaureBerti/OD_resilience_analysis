@@ -46,7 +46,7 @@ EXTRA = {"cardio": "cardio_ODDS", "vowels": "vowels_ODDS", "waveform": "Waveform
          "http": "http_ODDS"}
 CORE_N1000 = ["letter", "musk", "thyroid", "optdigits", "satellite", "pendigits", "annthyroid",
               "shuttle", "smtp", "skin", "covertype"]
-E2_DATASETS = CORE_N1000 + list(EXTRA)          # 11 + 13 = 24 datasets, all with N >= 1,000
+E2_DATASETS = CORE_N1000 + list(EXTRA)
 
 
 def tier_of(N: int) -> str:
@@ -96,12 +96,12 @@ def _adbench_synthetic(kind: str, base: str, alpha: float = 5.0, percentage: flo
     rng = np.random.default_rng(seed)
     if kind == "local":
         gm.covariances_ = alpha * gm.covariances_
-        gm.precisions_cholesky_ = None  # not used by sample()
+        gm.precisions_cholesky_ = None
         Xs_a = gm.sample(pts_a)[0]
     elif kind == "clustered":
         gm.means_ = alpha * gm.means_
         Xs_a = gm.sample(pts_a)[0]
-    else:  # global
+    else:
         lo = Xs_n.min(0) * (1 + percentage); hi = Xs_n.max(0) * (1 + percentage)
         Xs_a = rng.uniform(lo, hi, size=(pts_a, Xs_n.shape[1]))
     Xo = np.vstack([Xs_n, Xs_a]); yo = np.r_[np.zeros(pts_n, int), np.ones(pts_a, int)]

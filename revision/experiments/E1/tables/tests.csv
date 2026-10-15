@@ -6,6 +6,6 @@ Wilcoxon signed-rank I vs IV (datasets paired),16,0.0,,3.0517578125e-05,median d
 Wilcoxon signed-rank II vs III (datasets paired),16,61.0,,0.743560791015625,median diff=+0.029; mean diff=+0.003,0.743560791015625
 Wilcoxon signed-rank II vs IV (datasets paired),16,0.0,,3.0517578125e-05,median diff=+0.278; mean diff=+0.342,0.00018310546875
 Wilcoxon signed-rank III vs IV (datasets paired),16,0.0,,3.0517578125e-05,median diff=+0.366; mean diff=+0.339,0.00018310546875
-"Mixed model: C(method_class, Treatment('I'))[T.II] (random: dataset, method)",16,0.05697523907408829,,0.0330018705287456,"95% CI [0.005, 0.109]",
-"Mixed model: C(method_class, Treatment('I'))[T.III] (random: dataset, method)",16,0.0539900645657888,,0.09495027712990442,"95% CI [-0.009, 0.117]",
-"Mixed model: C(method_class, Treatment('I'))[T.IV] (random: dataset, method)",16,-0.28475479692324535,,1.6248966910969885e-67,"95% CI [-0.317, -0.253]",
+"Mixed model: C(method_class, Treatment('I'))[T.II] (random: dataset, method)",16,0.05632936600152921,,0.4726776638719985,"95% CI [-0.097, 0.210]",
+"Mixed model: C(method_class, Treatment('I'))[T.III] (random: dataset, method)",16,0.05334419149323049,,0.5558706287357451,"95% CI [-0.124, 0.231]",
+"Mixed model: C(method_class, Treatment('I'))[T.IV] (random: dataset, method)",16,-0.2854006699958005,,2.151324543878989e-05,"95% CI [-0.417, -0.154]",

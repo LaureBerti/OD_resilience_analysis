@@ -25,8 +25,8 @@ CLASSES = ["I", "II", "III", "IV"]
 @dataclass
 class Cfg:
     only: list = field(default_factory=list)
-    min_n_rate: int = 50          # rate fits use cells with n >= 50 (at least 5 flagged records)
-    min_n_forest: int = 512       # Prop. 3 assumes n >= 2 psi
+    min_n_rate: int = 50
+    min_n_forest: int = 512
 
 
 ConfigStore.instance().store(name="ar", node=Cfg)
@@ -82,7 +82,7 @@ def e1b(c):
     if df is None: return
     health(df, "E1b")
     excl = df[df.n < 10].groupby(["dataset", "p"]).n.first()
-    excl.to_csv(out("E1b") / "excluded_small_n.csv")        # samples too small to fit several methods
+    excl.to_csv(out("E1b") / "excluded_small_n.csv")
     df = df[df.n >= 10]
     dm = df.groupby(["p", "dataset", "method", "method_class"], as_index=False).rho.mean()
     cm = dm[dm.method_class.isin(CLASSES + ["G"])].groupby(["p", "dataset", "method_class"]).rho.mean().unstack()
@@ -107,14 +107,13 @@ def e2(c):
     g.to_csv(out("E2") / "rho_by_n.csv", index=False)
     g["y"] = np.log(1 - g.rho.clip(upper=1 - 1e-9))
     g["logn"] = np.log(g.n)
-    g["logfpc"] = np.log(g.n / (1 - g.p))          # theory: 1 - rho ~ ((1-p)/n)^kappa
+    g["logfpc"] = np.log(g.n / (1 - g.p))
     rows = []
     for m, t in g.groupby("method"):
         lim = c.min_n_forest if m in ("IForest", "EIF") else c.min_n_rate
         t = t[(t.n >= lim) & (t.rho < 1)]
         if t.dataset.nunique() < 3: continue
         for x in ("logn", "logfpc"):
-            # two-stage: OLS slope within each dataset (>= 3 cells), then mean and t-interval over datasets
             sl = []
             for _, u in t.groupby("dataset"):
                 if len(u) >= 3 and u[x].nunique() >= 3:
@@ -128,7 +127,6 @@ def e2(c):
     print(r.round(3).to_string())
     f = g[g.method.isin(["IForest", "EIF"])].copy()
     f["n_bin"] = pd.cut(f.n, [0, 32, 128, 256, 512, 1024, 2048, 5000])
-    # dataset is the unit: average cells within dataset x bin first, then over datasets
     fd = f.groupby(["method", "n_bin", "dataset"], observed=True).rho.mean().reset_index()
     fb = fd.groupby(["method", "n_bin"], observed=True).rho.agg(["mean", "min", "max", "count"]).reset_index()
     fb.to_csv(out("E2") / "forest_rho_by_n.csv", index=False)
@@ -207,7 +205,6 @@ def e5(c):
     per_ds = df.groupby(["method", "dataset", "p"]).rho.mean().unstack("p")
     t.to_csv(out("E5") / "summary.csv", index=False); per_ds.to_csv(out("E5") / "rho_by_dataset.csv")
     print(t.round(3).to_string())
-    # LaTeX table: rho by p (mean over the 3 datasets) + idle-machine runtime (time_runtime.py), if available
     rt_path = out("E5") / "runtime_idle.csv"
     rho = per_ds.groupby(level=0).mean()
     names = {"ThreeSigma": "$3\\sigma$", "ChiSquare": "$\\chi^2$"}
