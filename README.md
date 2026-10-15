@@ -156,10 +156,10 @@ Which script produces what (paths under `revision/experiments/` unless stated):
 | Paper item | Script | Output |
 |------------|--------|--------|
 | Table 6 (E1 by tier), Table 7 (E4), E1 tests (Friedman, Wilcoxon–Holm, mixed model) | `revision/code/analyze_E1.py` | `E1/tables/` |
-| E1b, E2 rates, Table 8 (E2b), E3, Table 9 (E5), the values of Table 10 (E6), E7, E8 | `revision/code/analyze_rest.py` | `E1b/`, `E2/`, `E2b5000/`, `E3/`, `E5/`, `X5/`, `X6/`, `X7/` `tables/` |
+| E1b, E2 rates, Table 8 (E2b), E3, Table 9 (E5), the values of Table 10 (E6), E7, E8 | `revision/code/analyze_rest.py` | `E1b/`, `E2/`, `E2b5000/`, `E2b_n_vs_p.csv`, `E3/`, `E5/`, `X5/`, `X6/`, `X7/` `tables/` |
 | E6, oblique-split check | `revision/code/oblique_variance.py` | `E6b/` |
-| Fig 1, Fig 2 | `revision/code/plot_fig1.py`, `plot_fig2.py` | `revision/figures/` |
-| S1–S3 Tables (S2 computed from `E1/raw/`), Table R1 of the response letter | `revision/code/make_si_tables.py` | `revision/SI/`, `validation/implementations_vs_reference.csv` |
+| Fig 1, Fig 2 | `revision/code/plot_fig1.py`, `plot_fig2.py` | `revision/figures/` (with `out_dir=revision/figures`, as in `run_all.sh`) |
+| S1–S3 Tables (S2 computed from `E1/raw/`), Table R1 of the response letter | `revision/code/make_si_tables.py` | `revision/SI/` (with `out_dir=revision/SI`, as in `run_all.sh`), `validation/implementations_vs_reference.csv` |
 | S1 Table data (ADOD port vs authors' code), Table R1 data | `revision/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
 | E5 runtimes | `revision/code/time_runtime.py` | `E5/tables/runtime_idle.csv` |
 
