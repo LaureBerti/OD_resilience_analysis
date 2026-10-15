@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# run_exp_E3.sh — E3 LOF k-Dependence Validation
-# Usage: bash run_exp_E3.sh [--dry-run]
 
 set -euo pipefail
 

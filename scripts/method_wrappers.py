@@ -36,9 +36,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import OneClassSVM
 
 
-# ---------------------------------------------------------------------------
-# Abstract base class
-# ---------------------------------------------------------------------------
 
 class BaseOutlierDetector(ABC):
     """Common interface for all outlier detectors."""
@@ -74,9 +71,6 @@ class BaseOutlierDetector(ABC):
             raise RuntimeError(f"{type(self).__name__} is not fitted yet.")
 
 
-# ---------------------------------------------------------------------------
-# Class I — Moment-based methods (custom implementations)
-# ---------------------------------------------------------------------------
 
 class ThreeSigmaDetector(BaseOutlierDetector):
     """
@@ -189,9 +183,6 @@ class ChiSquareDetector(BaseOutlierDetector):
         return chi2
 
 
-# ---------------------------------------------------------------------------
-# Class II — CDF/histogram-based (PyOD wrappers)
-# ---------------------------------------------------------------------------
 
 class COPODDetector(BaseOutlierDetector):
     """Wrapper for PyOD COPOD."""
@@ -201,7 +192,7 @@ class COPODDetector(BaseOutlierDetector):
         self._model = None
 
     def fit(self, X: np.ndarray) -> "COPODDetector":
-        from pyod.models.copod import COPOD  # type: ignore
+        from pyod.models.copod import COPOD
         self._model = COPOD(contamination=self.contamination)
         self._model.fit(np.asarray(X, dtype=float))
         self._fitted = True
@@ -220,7 +211,7 @@ class ECODDetector(BaseOutlierDetector):
         self._model = None
 
     def fit(self, X: np.ndarray) -> "ECODDetector":
-        from pyod.models.ecod import ECOD  # type: ignore
+        from pyod.models.ecod import ECOD
         self._model = ECOD(contamination=self.contamination)
         self._model.fit(np.asarray(X, dtype=float))
         self._fitted = True
@@ -256,7 +247,6 @@ class HBOSDetector(BaseOutlierDetector):
         for j in range(X.shape[1]):
             col = X[:, j]
             counts, edges = np.histogram(col, bins=self.n_bins)
-            # Normalise to density (area = 1); add small epsilon to avoid log(0)
             widths = np.diff(edges)
             widths = np.where(widths == 0, 1e-10, widths)
             density = counts / (counts.sum() * widths + 1e-10)
@@ -271,16 +261,12 @@ class HBOSDetector(BaseOutlierDetector):
         scores = np.zeros(len(X))
         for j, (edges, density) in enumerate(zip(self._bin_edges, self._densities)):
             col = X[:, j]
-            # Assign each point to the nearest bin; clip boundary values
             idx = np.searchsorted(edges[1:-1], col)
             d = np.maximum(density[idx], 1e-10)
             scores += -np.log(d)
         return scores
 
 
-# ---------------------------------------------------------------------------
-# Class III — Subsampling-based (PyOD IForest)
-# ---------------------------------------------------------------------------
 
 class IForestDetector(BaseOutlierDetector):
     """
@@ -315,14 +301,9 @@ class IForestDetector(BaseOutlierDetector):
 
     def decision_function(self, X: np.ndarray) -> np.ndarray:
         self._check_fitted()
-        # sklearn IForest returns negative scores (more negative = more anomalous).
-        # Negate so higher score = more anomalous, consistent with other detectors.
         return -self._model.score_samples(np.asarray(X, dtype=float))
 
 
-# ---------------------------------------------------------------------------
-# Class IV — Local density / distance-based
-# ---------------------------------------------------------------------------
 
 class LOFDetector(BaseOutlierDetector):
     """LOF (sklearn) — uses sklearn directly to avoid pyod/sklearn 1.x incompatibility."""
@@ -353,7 +334,6 @@ class LOFDetector(BaseOutlierDetector):
 
     def decision_function(self, X: np.ndarray) -> np.ndarray:
         self._check_fitted()
-        # sklearn LOF novelty=True: negative_outlier_factor_ → negate for consistency.
         return -self._model.score_samples(np.asarray(X, dtype=float))
 
 
@@ -382,7 +362,7 @@ class KNNDetector(BaseOutlierDetector):
     def decision_function(self, X: np.ndarray) -> np.ndarray:
         self._check_fitted()
         dists, _ = self._nn.kneighbors(np.asarray(X, dtype=float))
-        return dists[:, -1]  # distance to k-th nearest neighbor
+        return dists[:, -1]
 
 
 class OCSVMDetector(BaseOutlierDetector):
@@ -408,7 +388,6 @@ class OCSVMDetector(BaseOutlierDetector):
 
     def decision_function(self, X: np.ndarray) -> np.ndarray:
         self._check_fitted()
-        # sklearn OCSVM: positive = inlier, negative = outlier. Negate for consistency.
         return -self._model.decision_function(np.asarray(X, dtype=float))
 
 
@@ -508,7 +487,7 @@ class AutoEncoderDetector(BaseOutlierDetector):
         self._model = None
 
     def fit(self, X: np.ndarray) -> "AutoEncoderDetector":
-        from pyod.models.auto_encoder import AutoEncoder  # type: ignore
+        from pyod.models.auto_encoder import AutoEncoder
         X = np.asarray(X, dtype=float)
         self._model = AutoEncoder(
             hidden_neurons=self.hidden_neurons,
@@ -529,9 +508,6 @@ class AutoEncoderDetector(BaseOutlierDetector):
         return self._model.decision_function(np.asarray(X, dtype=float))
 
 
-# ---------------------------------------------------------------------------
-# Class III — Extended Isolation Forest  (Hariri et al., IEEE TKDE 2021)
-# ---------------------------------------------------------------------------
 
 def _c_factor(n: int) -> float:
     """Expected path length in an unsuccessful BST search (IForest normalisation)."""
@@ -625,9 +601,6 @@ class EIFDetector(BaseOutlierDetector):
         return -(2.0 ** (-total / len(self._trees) / c))
 
 
-# ---------------------------------------------------------------------------
-# Class IV — ADOD  (Qian et al., IEEE ICDM 2024)
-# ---------------------------------------------------------------------------
 
 def _adod_sigmas_batch(dists_sq: np.ndarray, target_perp: float,
                        tol: float = 1e-3, max_iter: int = 40) -> np.ndarray:
@@ -726,9 +699,6 @@ class ADODDetector(BaseOutlierDetector):
         return scores
 
 
-# ---------------------------------------------------------------------------
-# Class IV — ROD  (Almardeny et al., IEEE TKDE 2020)
-# ---------------------------------------------------------------------------
 
 class RODDetector(BaseOutlierDetector):
     """
@@ -738,7 +708,7 @@ class RODDetector(BaseOutlierDetector):
     When d > _MAX_DIM we project to _MAX_DIM PCA components first.
     """
 
-    _MAX_DIM = 5   # C(5,3)=10 subspaces — ~6 s/fit at n=5000
+    _MAX_DIM = 5
 
     def __init__(self, contamination: float = 0.10, random_state: int = 42):
         super().__init__(contamination, random_state)
@@ -746,7 +716,7 @@ class RODDetector(BaseOutlierDetector):
         self._pca   = None
 
     def fit(self, X: np.ndarray) -> "RODDetector":
-        from pyod.models.rod import ROD  # type: ignore
+        from pyod.models.rod import ROD
         X = np.asarray(X, dtype=float)
         n, d = X.shape
         if d > self._MAX_DIM:
@@ -773,9 +743,6 @@ class RODDetector(BaseOutlierDetector):
         return self._model.decision_function(X)
 
 
-# ---------------------------------------------------------------------------
-# Class IV — ABOD  (Kriegel et al., KDD 2008) — pure numpy FastABOD
-# ---------------------------------------------------------------------------
 
 class ABODDetector(BaseOutlierDetector):
     """
@@ -823,9 +790,6 @@ class ABODDetector(BaseOutlierDetector):
         return -scores
 
 
-# ---------------------------------------------------------------------------
-# Class IV — Feature Bagging  (Lazarevic & Kumar, KDD 2005) — LOF ensemble
-# ---------------------------------------------------------------------------
 
 class FeatureBaggingDetector(BaseOutlierDetector):
     """
@@ -872,15 +836,12 @@ class FeatureBaggingDetector(BaseOutlierDetector):
         return scores / len(self._lofs)
 
 
-# ---------------------------------------------------------------------------
-# Method registry
-# ---------------------------------------------------------------------------
 
 def _autoencoder_available() -> bool:
     """Return True if AutoEncoder's torch backend is importable."""
     try:
-        import torch  # noqa: F401
-        from pyod.models.auto_encoder import AutoEncoder  # noqa: F401
+        import torch
+        from pyod.models.auto_encoder import AutoEncoder
         return True
     except ImportError:
         return False

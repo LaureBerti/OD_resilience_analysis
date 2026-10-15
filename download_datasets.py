@@ -23,20 +23,13 @@ GITHUB_RAW = (
     "https://raw.githubusercontent.com/Minqi824/ADBench/main/adbench/datasets/Classical/"
 )
 
-# Maps our canonical dataset name → ADBench Classical filename.
-# Substitutions (no direct match in ADBench Classical):
-#   arrhythmia → vertebral   (Tier 1, N≈267, similar small size)
-#   kddcup99   → smtp        (Tier 3, N≈95K, network intrusion — same domain)
-#   forestcov  → skin        (Tier 3, N≈245K, large tabular)
 DATASET_MAP = {
-    # Tier 1 (N < 1000)
     "breastw":    "4_breastw.npz",
     "glass":      "14_glass.npz",
     "ionosphere": "18_Ionosphere.npz",
     "lympho":     "21_Lymphography.npz",
-    "vertebral":  "39_vertebral.npz",      # substituting arrhythmia
+    "vertebral":  "39_vertebral.npz",
 
-    # Tier 2 (1000 ≤ N ≤ 10000)
     "annthyroid": "2_annthyroid.npz",
     "letter":     "20_letter.npz",
     "musk":       "25_musk.npz",
@@ -45,25 +38,21 @@ DATASET_MAP = {
     "satellite":  "30_satellite.npz",
     "thyroid":    "38_thyroid.npz",
 
-    # Tier 3 (N > 10000)
     "covertype":  "10_cover.npz",
     "shuttle":    "32_shuttle.npz",
-    "smtp":       "34_smtp.npz",           # substituting kddcup99
-    "skin":       "33_skin.npz",           # substituting forestcov
+    "smtp":       "34_smtp.npz",
+    "skin":       "33_skin.npz",
 
-    # Tier 4 (N > 100000, for E5)
     "http":       "16_http.npz",
     "mammography":"23_mammography.npz",
 }
 
-# Tier 1-3 used for E1-E4
 TIER123 = [
     "breastw", "glass", "ionosphere", "lympho", "vertebral",
     "annthyroid", "letter", "musk", "optdigits", "pendigits", "satellite", "thyroid",
     "covertype", "shuttle", "smtp", "skin",
 ]
 
-# Tier 4 used for E5
 TIER4 = ["http", "mammography"]
 
 

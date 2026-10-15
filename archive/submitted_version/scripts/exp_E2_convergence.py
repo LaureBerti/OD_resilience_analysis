@@ -46,19 +46,15 @@ from data_loader import load_multiple
 from method_wrappers import make_detector
 from resilience_metrics import compute_resilience_pair
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 
 BASE_SEED = 42
 N_REPS = 30
 CONTAMINATION = 0.10
-PSI = 256  # IForest subsampling size
+PSI = 256
 
 PART_A_METHODS = ["MAD", "ECOD", "LOF"]
 PART_A_P_VALUES = [0.02, 0.05, 0.10, 0.15, 0.20, 0.30, 0.50]
 
-# 8 medium/large datasets for Part A
 PART_A_DATASETS = [
     "annthyroid", "musk", "pendigits", "satellite", "thyroid",
     "smtp", "shuttle", "skin",
@@ -66,18 +62,15 @@ PART_A_DATASETS = [
 
 PART_B_P_VALUES = [0.005, 0.01, 0.02, 0.05, 0.10, 0.20, 0.50]
 PART_B_DATASETS = [
-    "vertebral",    # N~267  — below psi for small p (substituting arrhythmia)
-    "breastw",      # N~683
-    "annthyroid",   # N~7200
-    "satellite",    # N~6435
-    "smtp",         # N~95156 (substituting kddcup99)
-    "shuttle",      # N~49097
+    "vertebral",
+    "breastw",
+    "annthyroid",
+    "satellite",
+    "smtp",
+    "shuttle",
 ]
 
 
-# ---------------------------------------------------------------------------
-# Core
-# ---------------------------------------------------------------------------
 
 def compute_rho_at_condition(
     X: np.ndarray,
@@ -196,10 +189,9 @@ def fit_power_law(df: pd.DataFrame) -> pd.DataFrame:
     """
     records = []
     for (method, ds), grp in df.groupby(["method", "dataset"]):
-        # Average over reps
         mean_by_n = grp.groupby("n_sample")["rho"].mean().reset_index()
         mean_by_n.columns = ["n", "rho_bar"]
-        mean_by_n = mean_by_n[mean_by_n["rho_bar"] < 1.0]  # avoid log(0)
+        mean_by_n = mean_by_n[mean_by_n["rho_bar"] < 1.0]
         mean_by_n = mean_by_n[mean_by_n["rho_bar"] > 0.0]
         mean_by_n["one_minus_rho"] = 1.0 - mean_by_n["rho_bar"]
         mean_by_n = mean_by_n[mean_by_n["one_minus_rho"] > 0]
@@ -248,7 +240,6 @@ def main():
     df_a = run_part_a(datasets)
     df_b = run_part_b(datasets)
 
-    # Combine and save raw
     df_b_iforest = df_b.copy()
     df_b_iforest["method"] = "IForest"
     df_all = pd.concat([df_a, df_b_iforest], ignore_index=True)
@@ -256,7 +247,6 @@ def main():
     df_all.to_csv(raw_path, index=False)
     print(f"\nRaw results saved: {raw_path}")
 
-    # Timing
     timing_path = RESULTS_DIR / "timing_per_condition.csv"
     df_timing = df_all[["dataset", "method", "p", "rep",
                          "time_fit_s", "time_score_s", "time_total_s"]].copy()
@@ -266,14 +256,12 @@ def main():
     else:
         df_timing.to_csv(timing_path, index=False)
 
-    # Fit power law for Part A
     print("\nFitting power-law convergence rates...")
     alpha_df = fit_power_law(df_a)
     alpha_path = TABLES_DIR / "e2_alpha_estimates.csv"
     alpha_df.to_csv(alpha_path, index=False)
     print(f"Alpha estimates saved: {alpha_path}")
 
-    # Summary
     print("\nAlpha estimates summary:")
     summary = alpha_df.groupby("method").agg(
         mean_alpha=("alpha_hat", "mean"),
@@ -281,7 +269,6 @@ def main():
     )
     print(summary.to_string())
 
-    # IForest phase transition summary
     print("\nIForest phase transition (Part B):")
     pt = df_b.groupby(["dataset", "n_sample"])["rho"].mean().reset_index()
     for ds in PART_B_DATASETS:

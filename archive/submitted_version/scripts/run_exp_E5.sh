@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-# run_exp_E5.sh — E5 Large-Scale Generalization and Runtime
-# Usage: bash run_exp_E5.sh [--dry-run]
-#
-# Runs Class I/II/III methods only on covertype (N=286K), skin (N=245K), smtp (N=95K).
-# Class IV (LOF, KNN) excluded: O(N²) at 100K+ records is infeasible.
-# Estimated runtime: 2-4 hours.
 export PYTHONUNBUFFERED=1
 
 set -euo pipefail

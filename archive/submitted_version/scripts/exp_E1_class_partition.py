@@ -26,16 +26,12 @@ import time
 import warnings
 from pathlib import Path
 
-# Suppress scipy skewness precision warnings on near-constant subsamples (harmless)
 warnings.filterwarnings("ignore", message="Precision loss occurred in moment calculation")
 
 import numpy as np
 import pandas as pd
 from scipy import stats
 
-# ---------------------------------------------------------------------------
-# Path setup — allow running from any directory
-# ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = SCRIPT_DIR.parent
 RESULTS_DIR = OUTPUT_DIR / "results"
@@ -52,27 +48,17 @@ from method_wrappers import make_detector, METHOD_CLASS_MAP, ALL_METHODS
 from resilience_metrics import compute_resilience_pair
 
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 P_SAMPLE = 0.10
 N_REPS = 50
 CONTAMINATION = 0.10
 BASE_SEED = 42
 
-# For datasets with N > N_MAX_FULL, the full-dataset reference is capped at
-# N_MAX_FULL samples (drawn once per dataset, shared across all methods/reps).
-# This makes LOF/KNN/OCSVM feasible on Tier 3 datasets (otherwise O(N^2)).
-# Noted in the paper: "Tier 3 datasets use N_ref = 5000 stratified reference."
 N_MAX_FULL = 5000
 
 E1_DATASETS = TIER1_DATASETS + TIER2_DATASETS + TIER3_DATASETS
 E1_METHODS = ALL_METHODS
 
 
-# ---------------------------------------------------------------------------
-# Core computation
-# ---------------------------------------------------------------------------
 
 def run_single_condition(
     X: np.ndarray,
@@ -112,31 +98,26 @@ def run_single_condition(
     t0 = time.perf_counter()
 
     try:
-        # Fit on full dataset
         t_fit_full_start = time.perf_counter()
         det_full = make_detector(method_name, contamination=contamination, random_state=BASE_SEED + rep)
         det_full.fit(X_full)
         t_fit_full_end = time.perf_counter()
         result["time_fit_full_s"] = t_fit_full_end - t_fit_full_start
 
-        # Scores from full model, restricted to sample indices
         t_score_start = time.perf_counter()
         scores_full_all = det_full.decision_function(X_full)
         scores_full_restricted = scores_full_all[idx_sample_sorted]
         t_score_end = time.perf_counter()
         result["time_score_s"] = t_score_end - t_score_start
 
-        # Fit on sample
         t_fit_sample_start = time.perf_counter()
         det_sample = make_detector(method_name, contamination=contamination, random_state=BASE_SEED + rep)
         det_sample.fit(X_sample)
         t_fit_sample_end = time.perf_counter()
         result["time_fit_sample_s"] = t_fit_sample_end - t_fit_sample_start
 
-        # Scores from sample model on sample
         scores_sample = det_sample.decision_function(X_sample)
 
-        # Compute resilience
         metrics = compute_resilience_pair(scores_sample, scores_full_restricted, contamination)
         result["rho"] = metrics["rho"]
         result["rho_tilde"] = metrics["rho_tilde"]
@@ -161,7 +142,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
         tier = DATASET_TIERS.get(ds_name, "?")
         t_dataset_start = time.perf_counter()
 
-        # Cap large datasets for computational feasibility (avoids O(N^2) LOF/KNN)
         n_orig = len(X)
         if n_orig > N_MAX_FULL:
             rng_cap = np.random.default_rng(BASE_SEED)
@@ -206,12 +186,10 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
 
 def save_results(df: pd.DataFrame) -> None:
     """Save raw results and aggregated tables."""
-    # Raw results
     raw_path = RESULTS_DIR / "e1_raw_results.csv"
     df.to_csv(raw_path, index=False)
     print(f"Raw results saved: {raw_path}")
 
-    # Timing CSV (append compatible)
     timing_cols = ["dataset", "method", "p", "rep",
                    "time_fit_full_s", "time_fit_sample_s", "time_score_s", "time_total_s"]
     timing_path = RESULTS_DIR / "timing_per_condition.csv"
@@ -222,7 +200,6 @@ def save_results(df: pd.DataFrame) -> None:
     else:
         df_timing.to_csv(timing_path, index=False)
 
-    # Aggregated: mean±std rho by class × tier
     agg = (
         df.groupby(["tier", "method_class", "method"])
         .agg(
@@ -245,7 +222,7 @@ def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
     with Bonferroni correction.
     """
     try:
-        import scikit_posthocs as sp  # type: ignore
+        import scikit_posthocs as sp
     except ImportError:
         warnings.warn(
             "scikit_posthocs not installed. Skipping Dunn test. "
@@ -253,7 +230,6 @@ def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
         )
         sp = None
 
-    # Collect per-class vectors of rho
     classes = ["I", "II", "III", "IV"]
     class_rho = {c: df[df["method_class"] == c]["rho"].dropna().values for c in classes}
 
@@ -264,7 +240,6 @@ def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
     kw_records = [{"test": "Kruskal-Wallis", "H": h_stat, "p": p_value}]
 
     if sp is not None:
-        # Build long-form DataFrame for Dunn test
         rho_long = df[["method_class", "rho"]].dropna()
         dunn = sp.posthoc_dunn(
             rho_long, val_col="rho", group_col="method_class", p_adjust="bonferroni"
@@ -280,9 +255,6 @@ def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
     return kw_df
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main():
     print("=" * 60)
@@ -294,7 +266,6 @@ def main():
 
     t0 = time.perf_counter()
 
-    # Load datasets
     print("\nLoading datasets...")
     datasets = load_multiple(E1_DATASETS, skip_on_error=True)
     if not datasets:
@@ -302,13 +273,10 @@ def main():
         sys.exit(1)
     print(f"Loaded {len(datasets)} / {len(E1_DATASETS)} datasets.")
 
-    # Run experiment
     df = run_experiment(datasets)
 
-    # Save
     save_results(df)
 
-    # Statistical tests
     run_statistical_tests(df)
 
     t1 = time.perf_counter()

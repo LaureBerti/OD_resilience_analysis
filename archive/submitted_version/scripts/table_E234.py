@@ -29,7 +29,6 @@ def table_e2():
             continue
         mean_alpha = sub["alpha_hat"].mean()
         mean_r2 = sub["R2"].mean()
-        # 95% CI across datasets (using std)
         std_alpha = sub["alpha_hat"].std()
         ci_lo = mean_alpha - 1.96 * std_alpha / np.sqrt(len(sub))
         ci_hi = mean_alpha + 1.96 * std_alpha / np.sqrt(len(sub))
@@ -46,7 +45,6 @@ def table_e3():
     lof_df = df[df["method"] == "LOF"]
     print("\n=== E3: LOF regression by dataset ===")
 
-    # Dataset name mapping (our substitutions → paper names)
     ds_name_map = {
         "annthyroid": "Annthyroid",
         "thyroid":    "Thyroid",
@@ -110,11 +108,9 @@ def table_e4():
         diff = row["mean_rho_tilde"] - row["mean_rho"]
         print(f"  {METHOD_DISPLAY.get(method, method)} & {row['mean_rho']:.3f} & {row['mean_rho_tilde']:.3f} & {diff:+.3f} & {p_str} \\\\")
 
-    # Threshold sensitivity summary
     thresh_path = TABLES_DIR / "e4_threshold_sensitivity.csv"
     if thresh_path.exists():
         thresh = pd.read_csv(thresh_path)
-        # LOF variation across thresholds
         lof_t = thresh[thresh["method"] == "LOF"]
         if len(lof_t) > 0:
             max_var = lof_t.groupby("dataset")["mean_rho"].agg(lambda x: x.max() - x.min()).max()

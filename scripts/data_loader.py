@@ -21,17 +21,6 @@ from typing import Optional
 import numpy as np
 
 
-# ---------------------------------------------------------------------------
-# ADBench canonical name → fallback file name mappings
-# Some datasets have slightly different names between the ADBench Python
-# package and the raw .npz files in the GitHub repo.
-# ---------------------------------------------------------------------------
-# Maps our canonical dataset name → the .npz filename saved in ./data/
-# by download_datasets.py (all saved without the ADBench numeric prefix).
-# Substitutions vs. the original benchmark plan:
-#   arrhythmia → vertebral  (ADBench: 39_vertebral; N≈267, Tier 1)
-#   kddcup99   → smtp       (ADBench: 34_smtp;      N≈95K, network intrusion, Tier 3)
-#   forestcov  → skin       (ADBench: 33_skin;      N≈245K, large tabular, Tier 3)
 _NPZ_FILENAME_MAP: dict[str, str] = {
     "vertebral":  "vertebral",
     "breastw":    "breastw",
@@ -53,13 +42,9 @@ _NPZ_FILENAME_MAP: dict[str, str] = {
     "mammography":"mammography",
 }
 
-# Legacy alias kept for backward compat (adbench package not installed)
 _ADBENCH_NAME_MAP = _NPZ_FILENAME_MAP
 
-# Default data directory: Outlier_resilience/data/
-# scripts/ -> github_repo/ -> Outlier_resilience/ -> data/
 _HERE_DL = Path(__file__).resolve().parent
-# data/ sits next to scripts/ in the public repository, and two levels up in the paper project
 _DEFAULT_DATA_DIR = next((d for d in (_HERE_DL.parent / "data", _HERE_DL.parent.parent / "data")
                           if any(d.glob("*.npz"))), _HERE_DL.parent / "data")
 
@@ -70,7 +55,7 @@ def _load_from_adbench_package(dataset_name: str) -> Optional[tuple]:
     Returns (X, y) or None on failure.
     """
     try:
-        from adbench.myutils import Utils  # type: ignore
+        from adbench.myutils import Utils
 
         utils = Utils()
         data = utils.load_data(dataset=dataset_name)
@@ -82,7 +67,6 @@ def _load_from_adbench_package(dataset_name: str) -> Optional[tuple]:
     except Exception:
         pass
 
-    # Second attempt: try adbench.datasets if available
     try:
         import importlib
 
@@ -116,12 +100,10 @@ def _load_from_npz(dataset_name: str, data_dir: Path) -> Optional[tuple]:
         if path.exists():
             try:
                 npz = np.load(path, allow_pickle=False)
-                # Try standard keys
                 if "X" in npz and "y" in npz:
                     X = np.asarray(npz["X"], dtype=float)
                     y = np.asarray(npz["y"], dtype=int).ravel()
                     return X, y
-                # Fallback key names
                 if "data" in npz and "labels" in npz:
                     X = np.asarray(npz["data"], dtype=float)
                     y = np.asarray(npz["labels"], dtype=int).ravel()
@@ -169,14 +151,12 @@ def load_dataset(
     else:
         resolved_dir = Path(data_dir)
 
-    # Strategy 1: adbench package
     result = _load_from_adbench_package(dataset_name)
     if result is not None:
         X, y = result
         _validate(X, y, dataset_name)
         return X, y
 
-    # Strategy 2: .npz file
     result = _load_from_npz(dataset_name, resolved_dir)
     if result is not None:
         X, y = result
@@ -214,17 +194,14 @@ def _validate(X: np.ndarray, y: np.ndarray, name: str) -> None:
         )
 
 
-# ---------------------------------------------------------------------------
-# Dataset registry
-# ---------------------------------------------------------------------------
 
-TIER1_DATASETS = ["vertebral", "breastw", "glass", "lympho"]   # N < 1000
+TIER1_DATASETS = ["vertebral", "breastw", "glass", "lympho"]
 TIER2_DATASETS = [
     "annthyroid", "ionosphere", "letter", "musk",
     "optdigits", "pendigits", "satellite", "thyroid",
-]   # 1000 ≤ N ≤ 10000
-TIER3_DATASETS = ["smtp", "shuttle", "covertype", "skin"]       # N > 10000
-TIER4_DATASETS = ["http", "mammography"]                        # N > 100000 (unavailable — use covertype/skin for E5)
+]
+TIER3_DATASETS = ["smtp", "shuttle", "covertype", "skin"]
+TIER4_DATASETS = ["http", "mammography"]
 
 ALL_DATASETS = TIER1_DATASETS + TIER2_DATASETS + TIER3_DATASETS + TIER4_DATASETS
 

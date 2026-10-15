@@ -31,7 +31,6 @@ def main():
     raw_path = RESULTS_DIR / "e1_raw_results.csv"
     df = pd.read_csv(raw_path)
 
-    # Method display names and column order
     METHOD_COLS = [
         ("ThreeSigma", "3Sig"),
         ("BoxPlot",    "Box"),
@@ -55,13 +54,11 @@ def main():
     tiers = ["T1", "T2", "T3"]
     tier_labels = {"T1": "T1", "T2": "T2", "T3": "T3"}
 
-    # Compute mean±std per (tier, method)
     agg = (
         df.groupby(["tier", "method"])["rho"]
         .agg(mean="mean", std="std")
         .reset_index()
     )
-    # Also compute "All"
     all_agg = (
         df.groupby("method")["rho"]
         .agg(mean="mean", std="std")
@@ -71,7 +68,6 @@ def main():
 
     agg = pd.concat([agg, all_agg], ignore_index=True)
 
-    # Build table rows
     rows = []
     for tier in ["T1", "T2", "T3", "All"]:
         row_data = []
@@ -87,7 +83,6 @@ def main():
                 means[m] = r["mean"].iloc[0]
                 stds[m] = r["std"].iloc[0]
 
-        # Find best and second-best
         valid_means = {m: v for m, v in means.items() if not np.isnan(v)}
         sorted_means = sorted(valid_means.items(), key=lambda x: x[1], reverse=True)
         best = sorted_means[0][0] if len(sorted_means) > 0 else None
@@ -111,7 +106,6 @@ def main():
         row_str += " \\\\"
         rows.append(row_str)
 
-    # Print Kruskal-Wallis stats
     kw_path = TABLES_DIR / "e1_kruskal_wallis.csv"
     kw = pd.read_csv(kw_path)
     H = kw["H"].iloc[0]
@@ -119,7 +113,6 @@ def main():
     print(f"% Kruskal-Wallis H={H:.1f}, p={p:.2e}")
     print()
 
-    # Print table
     print("% --- E1 Main Table (paste into experiments_revised.tex) ---")
     print("% Replace [TODO: replace with Python results] in caption with:")
     print(f"% Kruskal-Wallis $H={H:.1f}$, $p<0.001$.")
@@ -128,7 +121,6 @@ def main():
     for row in rows:
         print(row)
 
-    # Save
     out_path = TABLES_DIR / "e1_latex_table.txt"
     with open(out_path, "w") as f:
         f.write(f"% Kruskal-Wallis H={H:.1f}, p={p:.2e}\n\n")
@@ -136,7 +128,6 @@ def main():
             f.write(row + "\n")
     print(f"\nSaved: {out_path}")
 
-    # Also print class-level summary
     print("\n% Class-level mean rho (All tiers, All datasets):")
     class_agg = df.groupby("method_class")["rho"].agg(mean="mean", std="std")
     for cls in ["I", "II", "III", "IV"]:

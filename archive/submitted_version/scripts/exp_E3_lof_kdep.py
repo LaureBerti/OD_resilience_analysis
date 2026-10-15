@@ -42,9 +42,6 @@ from data_loader import load_multiple
 from method_wrappers import make_detector
 from resilience_metrics import compute_resilience_pair
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 
 BASE_SEED = 42
 N_REPS = 30
@@ -53,19 +50,16 @@ CONTAMINATION = 0.10
 K_VALUES = [3, 5, 10, 15, 20]
 P_VALUES = [0.05, 0.10, 0.20]
 
-E3_METHODS = ["LOF", "KNN"]  # KNN as control
+E3_METHODS = ["LOF", "KNN"]
 
 E3_DATASETS = [
-    "glass", "lympho",         # Tier 1
-    "annthyroid", "thyroid",   # Tier 2
-    "letter", "optdigits",     # Tier 2
-    "smtp", "skin",             # Tier 3 (substituting kddcup99, forestcov)
+    "glass", "lympho",
+    "annthyroid", "thyroid",
+    "letter", "optdigits",
+    "smtp", "skin",
 ]
 
 
-# ---------------------------------------------------------------------------
-# Core
-# ---------------------------------------------------------------------------
 
 def compute_rho_k_condition(
     X: np.ndarray,
@@ -98,7 +92,6 @@ def compute_rho_k_condition(
 
     t0 = time.perf_counter()
     try:
-        # Fit on full
         t_fit = time.perf_counter()
         det_full = make_detector(
             method_name, contamination=contamination,
@@ -109,7 +102,6 @@ def compute_rho_k_condition(
         scores_full_restricted = scores_full[idx]
         row["time_fit_s"] = time.perf_counter() - t_fit
 
-        # Fit on sample
         t_score = time.perf_counter()
         effective_k = min(k, n_sample - 1)
         det_s = make_detector(
@@ -156,7 +148,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
                         records.append(row)
                         done += 1
 
-                    # Progress
                     subset = [r for r in records
                                if r["dataset"] == ds_name
                                and r["method"] == method_name
@@ -223,12 +214,10 @@ def main():
 
     df = run_experiment(datasets)
 
-    # Save raw
     raw_path = RESULTS_DIR / "e3_raw_results.csv"
     df.to_csv(raw_path, index=False)
     print(f"\nRaw results saved: {raw_path}")
 
-    # Timing
     timing_path = RESULTS_DIR / "timing_per_condition.csv"
     df_timing = df[["dataset", "method", "p", "rep",
                     "time_fit_s", "time_score_s", "time_total_s"]].copy()
@@ -238,14 +227,12 @@ def main():
     else:
         df_timing.to_csv(timing_path, index=False)
 
-    # Regression
     print("\nFitting linear regression: 1-rho ~ 1/sqrt(kp)...")
     reg_df = fit_linear_regression(df)
     reg_path = TABLES_DIR / "e3_regression_results.csv"
     reg_df.to_csv(reg_path, index=False)
     print(f"Regression results saved: {reg_path}")
 
-    # Summary
     print("\nRegression summary (LOF):")
     lof_reg = reg_df[reg_df["method"] == "LOF"]
     if len(lof_reg) > 0:

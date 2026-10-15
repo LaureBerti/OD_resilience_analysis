@@ -43,29 +43,19 @@ from data_loader import load_multiple
 from method_wrappers import make_detector, METHOD_CLASS_MAP, CLASS_I_METHODS, CLASS_II_METHODS, CLASS_III_METHODS
 from resilience_metrics import compute_resilience_pair
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 
 BASE_SEED = 42
 N_REPS = 10
 P_VALUES = [0.01, 0.05, 0.10]
 CONTAMINATION = 0.10
 
-# Class IV (LOF, KNN) excluded: O(N²) complexity at N>100K is infeasible.
-# AutoEncoder excluded: torch not available in benchmark environment.
 E5_METHODS = CLASS_I_METHODS + CLASS_II_METHODS + CLASS_III_METHODS
 
-# HTTP/Census/CreditCard unavailable in ADBench Classical.
-# Covertype (N=286K, d=10) and skin (N=245K, d=3) are used as substitutes.
 E5_DATASETS = ["covertype", "skin", "smtp"]
-RUNTIME_DATASET = "covertype"   # substitute for HTTP as speedup baseline
+RUNTIME_DATASET = "covertype"
 RUNTIME_REPS = 5
 
 
-# ---------------------------------------------------------------------------
-# Core
-# ---------------------------------------------------------------------------
 
 def run_single_condition(
     X: np.ndarray,
@@ -97,7 +87,6 @@ def run_single_condition(
 
     t0 = time.perf_counter()
     try:
-        # Full model
         t_fit_full = time.perf_counter()
         det_full = make_detector(method_name, contamination=contamination, random_state=BASE_SEED + rep)
         det_full.fit(X)
@@ -105,14 +94,13 @@ def run_single_condition(
         scores_full_restricted = scores_full[idx]
         row["time_fit_full_s"] = time.perf_counter() - t_fit_full
 
-        # Sample model
         t_fit_sample = time.perf_counter()
         det_s = make_detector(method_name, contamination=contamination, random_state=BASE_SEED + rep)
         det_s.fit(X[idx])
         scores_sample = det_s.decision_function(X[idx])
         row["time_fit_sample_s"] = time.perf_counter() - t_fit_sample
 
-        row["time_score_s"] = row["time_fit_full_s"]  # dominated by fit
+        row["time_score_s"] = row["time_fit_full_s"]
 
         metrics = compute_resilience_pair(scores_sample, scores_full_restricted, contamination)
         row["rho"] = metrics["rho"]
@@ -169,7 +157,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
                     records.append(row)
                     done += 1
 
-                # Summary per (method, p)
                 subset = [r for r in records
                           if r["dataset"] == ds_name and r["method"] == method_name and r["p"] == p]
                 mean_rho = np.nanmean([r["rho"] for r in subset])
@@ -197,7 +184,6 @@ def run_runtime_benchmark(datasets: dict) -> pd.DataFrame:
 
     runtime_records = []
 
-    # Full dataset timing
     for method_name in E5_METHODS:
         print(f"  Full: {method_name}...")
         rec = run_full_dataset_timing(X, method_name)
@@ -205,7 +191,6 @@ def run_runtime_benchmark(datasets: dict) -> pd.DataFrame:
         rec["sampling"] = "full"
         runtime_records.append(rec)
 
-    # p=10% timing
     p = 0.10
     n_sample = int(np.floor(p * len(X)))
     rng = np.random.default_rng(BASE_SEED)
@@ -240,7 +225,6 @@ def run_runtime_benchmark(datasets: dict) -> pd.DataFrame:
 
     df_rt = pd.DataFrame(runtime_records)
 
-    # Compute speedup
     full_times = df_rt[df_rt["sampling"] == "full"].set_index("method")["time_mean_s"]
     sample_times = df_rt[df_rt["sampling"] == "p=10%"].set_index("method")["time_mean_s"]
     speedup = full_times / sample_times
@@ -278,15 +262,12 @@ def main():
         print("ERROR: No Tier 4 datasets available. Check data_loader.py.")
         sys.exit(1)
 
-    # Main experiment
     df = run_experiment(datasets)
 
-    # Save raw
     raw_path = RESULTS_DIR / "e5_raw_results.csv"
     df.to_csv(raw_path, index=False)
     print(f"\nRaw results saved: {raw_path}")
 
-    # Timing CSV
     timing_path = RESULTS_DIR / "timing_per_condition.csv"
     df_timing = df[["dataset", "method", "p", "rep",
                     "time_fit_full_s", "time_fit_sample_s", "time_score_s", "time_total_s"]].copy()
@@ -296,7 +277,6 @@ def main():
     else:
         df_timing.to_csv(timing_path, index=False)
 
-    # Aggregated resilience table
     agg = (
         df.groupby(["method", "method_class", "p"])
         .agg(
@@ -310,7 +290,6 @@ def main():
     agg.to_csv(agg_path, index=False)
     print(f"Resilience table saved: {agg_path}")
 
-    # Runtime benchmark
     run_runtime_benchmark(datasets)
 
     t1 = time.perf_counter()

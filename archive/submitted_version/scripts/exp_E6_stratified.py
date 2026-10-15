@@ -43,10 +43,8 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore", message="Precision loss occurred in moment calculation")
 
-# Preflight: fail fast if pyod is missing so the error is obvious rather than
-# appearing silently per-method mid-run.
 try:
-    import pyod  # noqa: F401
+    import pyod
 except ModuleNotFoundError:
     sys.exit(
         "ERROR: 'pyod' is not installed in the current Python environment.\n"
@@ -78,31 +76,23 @@ from data_loader import (
 from method_wrappers import make_detector, METHOD_CLASS_MAP
 from resilience_metrics import compute_resilience_pair
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 P_VALUES    = [0.05, 0.10, 0.20]
-N_REPS_T2   = 30   # Tier 2 datasets
-N_REPS_T3   = 10   # Tier 3 datasets (runtime limit)
+N_REPS_T2   = 30
+N_REPS_T3   = 10
 CONTAMINATION = 0.10
 BASE_SEED   = 42
 
-# Focus methods: Classes I/II for monotonicity claim; LOF as negative control.
 E6_METHODS = [
-    "ThreeSigma", "BoxPlot", "MAD", "ChiSquare",   # Class I
-    "COPOD", "ECOD", "HBOS",                        # Class II
-    "LOF",                                           # Class IV negative control
+    "ThreeSigma", "BoxPlot", "MAD", "ChiSquare",
+    "COPOD", "ECOD", "HBOS",
+    "LOF",
 ]
 
-E6_DATASETS = TIER2_DATASETS + TIER3_DATASETS  # N >= 1000
+E6_DATASETS = TIER2_DATASETS + TIER3_DATASETS
 
-# Proxy strata K for k-means alternative (used alongside label-based strata)
 KMEANS_STRATA_K = 5
 
 
-# ---------------------------------------------------------------------------
-# Sampling helpers
-# ---------------------------------------------------------------------------
 
 def _stratify_by_label(
     N: int,
@@ -129,17 +119,13 @@ def _stratify_by_label(
     N_out = len(idx_out)
 
     if N_out == 0 or N_in == 0:
-        # Degenerate: fall back to SRSWOR
         return np.sort(rng.choice(N, size=n, replace=False))
 
-    # Proportionate allocation
     n_out = max(1, round(n * N_out / N))
     n_in  = n - n_out
 
-    # Guard against requesting more than stratum size
     n_out = min(n_out, N_out)
     n_in  = min(n_in,  N_in)
-    # Re-adjust total if clamped
     if n_in + n_out < n:
         remainder = n - n_in - n_out
         if N_in - n_in >= remainder:
@@ -186,7 +172,6 @@ def _stratify_by_kmeans(
         indices_collected.append(sampled)
 
     all_idx = np.concatenate(indices_collected)
-    # Adjust to exactly n if rounding caused mismatch
     if len(all_idx) > n:
         all_idx = rng.choice(all_idx, size=n, replace=False)
     elif len(all_idx) < n:
@@ -197,9 +182,6 @@ def _stratify_by_kmeans(
     return np.sort(all_idx)
 
 
-# ---------------------------------------------------------------------------
-# Core computation
-# ---------------------------------------------------------------------------
 
 def _run_arm(
     X: np.ndarray,
@@ -247,40 +229,32 @@ def run_single_condition(
         "rep": rep,
         "n_full": N,
         "n_sample": n,
-        # SRSWOR arm
         "rho_srs":        np.nan,
         "rho_tilde_srs":  np.nan,
-        # Stratified (label-based) arm
         "rho_str":        np.nan,
         "rho_tilde_str":  np.nan,
-        # Stratified (k-means proxy) arm
         "rho_str_km":     np.nan,
         "rho_tilde_str_km": np.nan,
-        # Diagnostics
         "time_total_s":   np.nan,
         "error":          None,
     }
 
     t0 = time.perf_counter()
     try:
-        # Fit on full dataset once; reuse scores for both arms
         det_full = make_detector(method_name, contamination=contamination, random_state=seed)
         det_full.fit(X)
         scores_full = det_full.decision_function(X)
 
-        # --- SRSWOR arm ---
         idx_srs = np.sort(rng.choice(N, size=n, replace=False))
         m_srs   = _run_arm(X, scores_full, idx_srs, method_name, contamination, seed)
         row["rho_srs"]       = m_srs["rho"]
         row["rho_tilde_srs"] = m_srs["rho_tilde"]
 
-        # --- Stratified (label-based) arm ---
         idx_str = _stratify_by_label(N, y, n, rng)
         m_str   = _run_arm(X, scores_full, idx_str, method_name, contamination, seed)
         row["rho_str"]       = m_str["rho"]
         row["rho_tilde_str"] = m_str["rho_tilde"]
 
-        # --- Stratified (k-means proxy) arm ---
         idx_km = _stratify_by_kmeans(X, n, rng, K=KMEANS_STRATA_K, seed=seed)
         m_km   = _run_arm(X, scores_full, idx_km, method_name, contamination, seed)
         row["rho_str_km"]       = m_km["rho"]
@@ -318,7 +292,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
                     all_records.append(row)
                     total_done += 1
 
-            # Per-method summary
             subset = [r for r in all_records
                       if r["dataset"] == ds_name and r["method"] == method_name]
             mean_delta = np.nanmean([
@@ -335,9 +308,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
     return pd.DataFrame(all_records)
 
 
-# ---------------------------------------------------------------------------
-# Statistical analysis
-# ---------------------------------------------------------------------------
 
 def compute_delta_rho_table(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -350,7 +320,6 @@ def compute_delta_rho_table(df: pd.DataFrame) -> pd.DataFrame:
 
     records = []
     for (method, p, cls), grp in df.groupby(["method", "p", "method_class"]):
-        # Per-dataset mean delta (one observation per dataset for Wilcoxon)
         per_ds = grp.groupby("dataset")["delta_rho_label"].mean().dropna()
         per_ds_km = grp.groupby("dataset")["delta_rho_km"].mean().dropna()
 
@@ -358,7 +327,6 @@ def compute_delta_rho_table(df: pd.DataFrame) -> pd.DataFrame:
         mean_delta = float(per_ds.mean()) if n_ds > 0 else np.nan
         std_delta  = float(per_ds.std())  if n_ds > 0 else np.nan
 
-        # Wilcoxon signed-rank H0: Delta_rho <= 0, H1: Delta_rho > 0
         wx_stat, wx_p = np.nan, np.nan
         if n_ds >= 4:
             try:
@@ -392,9 +360,6 @@ def run_statistical_tests(df: pd.DataFrame) -> None:
                      "std_delta_label", "wilcoxon_p"]].to_string(index=False))
 
 
-# ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
 
 def make_plots(df: pd.DataFrame) -> None:
     """
@@ -475,9 +440,6 @@ def make_plots(df: pd.DataFrame) -> None:
         print(f"Figure saved: {fpath}")
 
 
-# ---------------------------------------------------------------------------
-# Save outputs
-# ---------------------------------------------------------------------------
 
 def save_results(df: pd.DataFrame) -> None:
     raw_path = RESULTS_DIR / "e6_raw_results.csv"
@@ -493,9 +455,6 @@ def save_results(df: pd.DataFrame) -> None:
         df_timing.to_csv(timing_path, index=False)
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     print("=" * 65)

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# run_exp_E1.sh — E1 Class Partition Validation
-# Usage: bash run_exp_E1.sh [--dry-run]
 
 set -euo pipefail
 
@@ -34,7 +32,6 @@ if [ "$DRY_RUN" = "1" ]; then
     exit 0
 fi
 
-# Run experiment
 python "${SCRIPT_DIR}/exp_E1_class_partition.py" 2>&1 | tee "${LOG_FILE}"
 
 echo ""

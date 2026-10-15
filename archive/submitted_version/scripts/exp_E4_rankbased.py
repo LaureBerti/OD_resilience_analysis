@@ -48,22 +48,17 @@ from data_loader import load_multiple
 from method_wrappers import make_detector, ALL_METHODS
 from resilience_metrics import dice_resilience, rank_resilience, scores_to_labels
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 
 BASE_SEED = 42
 N_REPS = 50
 P_SAMPLE = 0.10
 
-# Part A: 12 datasets
 PART_A_DATASETS = [
-    "vertebral", "breastw", "glass", "lympho",         # T1 (vertebral substitutes arrhythmia)
-    "annthyroid", "ionosphere", "pendigits", "thyroid", # T2
-    "smtp", "shuttle", "covertype", "skin",             # T3 (smtp/skin substitute kddcup99/forestcov)
+    "vertebral", "breastw", "glass", "lympho",
+    "annthyroid", "ionosphere", "pendigits", "thyroid",
+    "smtp", "shuttle", "covertype", "skin",
 ]
 
-# Part B: 5 datasets, 2 methods
 PART_B_DATASETS = [
     "annthyroid", "satellite", "smtp", "shuttle", "skin"
 ]
@@ -71,9 +66,6 @@ PART_B_METHODS = ["IForest", "LOF"]
 THRESHOLD_PCT_VALUES = [0.05, 0.08, 0.10, 0.12, 0.15]
 
 
-# ---------------------------------------------------------------------------
-# Core
-# ---------------------------------------------------------------------------
 
 def run_single_rep_part_a(
     X: np.ndarray,
@@ -223,7 +215,6 @@ def run_part_b(datasets: dict) -> pd.DataFrame:
                     row["dataset"] = ds_name
                     row["part"] = "B"
                     records.append(row)
-            # Summary by threshold
             for threshold_pct in THRESHOLD_PCT_VALUES:
                 subset = [
                     r for r in records
@@ -298,7 +289,6 @@ def main():
     df_all.to_csv(raw_path, index=False)
     print(f"\nRaw results saved: {raw_path}")
 
-    # Timing
     timing_path = RESULTS_DIR / "timing_per_condition.csv"
     df_timing = df_all[["dataset", "method", "p", "rep", "time_total_s"]].copy()
     df_timing["experiment"] = "E4"
@@ -307,7 +297,6 @@ def main():
     else:
         df_timing.to_csv(timing_path, index=False)
 
-    # Wilcoxon test (Part A)
     print("\nRunning Wilcoxon signed-rank tests...")
     wilcoxon_df = run_wilcoxon_test(df_a)
     wilcoxon_path = TABLES_DIR / "e4_rho_vs_rhotilde.csv"
@@ -316,7 +305,6 @@ def main():
     print("\nWilcoxon summary:")
     print(wilcoxon_df[["method", "mean_rho", "mean_rho_tilde", "mean_diff", "wilcoxon_p"]].to_string(index=False))
 
-    # Threshold sensitivity summary (Part B)
     thresh_agg = (
         df_b.groupby(["method", "dataset", "threshold_pct"])
         .agg(mean_rho=("rho", "mean"), mean_rho_tilde=("rho_tilde", "mean"))

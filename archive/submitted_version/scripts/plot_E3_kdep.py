@@ -76,7 +76,6 @@ def plot_kdep_scatter(df: pd.DataFrame, reg_df: pd.DataFrame, method: str) -> No
             sub = ds_df[ds_df["p"] == p_val]
             if len(sub) == 0:
                 continue
-            # Mean over reps per k
             mean_by_k = sub.groupby("k").agg(
                 mean_1mr=("one_minus_rho", "mean"),
                 kp_inv_sqrt=("kp_inv_sqrt", "first"),
@@ -88,11 +87,9 @@ def plot_kdep_scatter(df: pd.DataFrame, reg_df: pd.DataFrame, method: str) -> No
                 s=50, zorder=5, label=f"p={p_val:.0%}"
             )
 
-        # Overall regression line
         if len(reg_df) > 0:
             reg_row = reg_df[(reg_df["method"] == method) & (reg_df["dataset"] == ds)]
             if len(reg_row) > 0:
-                # Use mean slope/intercept across p values
                 slope = reg_row["slope"].mean()
                 intercept = reg_row["intercept"].mean()
                 r2_mean = reg_row["R2"].mean()
@@ -103,7 +100,6 @@ def plot_kdep_scatter(df: pd.DataFrame, reg_df: pd.DataFrame, method: str) -> No
                     label=f"fit (R²={r2_mean:.2f})"
                 )
         else:
-            # Fit directly
             x = ds_df["kp_inv_sqrt"].values
             y = ds_df["one_minus_rho"].values
             valid = np.isfinite(x) & np.isfinite(y)
@@ -121,7 +117,6 @@ def plot_kdep_scatter(df: pd.DataFrame, reg_df: pd.DataFrame, method: str) -> No
         ax.grid(alpha=0.3)
         ax.set_ylim(bottom=0)
 
-    # Hide unused axes
     for ds_idx in range(n_ds, nrows * ncols):
         axes[ds_idx // ncols][ds_idx % ncols].set_visible(False)
 
@@ -154,7 +149,6 @@ def plot_comparison_lof_knn(df: pd.DataFrame) -> None:
             ax.set_title(f"{method}: no data")
             continue
 
-        # Scatter: pool all datasets, colour by dataset
         datasets = sorted(sub["dataset"].unique())
         colors = plt.cm.tab10(np.linspace(0, 1, len(datasets)))
 
@@ -166,7 +160,6 @@ def plot_comparison_lof_knn(df: pd.DataFrame) -> None:
                 color=color, s=20, alpha=0.7, label=ds
             )
 
-        # Pool regression line
         x = sub["kp_inv_sqrt"].values
         y = sub["one_minus_rho"].values
         valid = np.isfinite(x) & np.isfinite(y)

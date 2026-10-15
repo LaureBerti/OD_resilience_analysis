@@ -55,7 +55,7 @@ def dice_resilience(
 
     denom = a + b
     if denom == 0:
-        return np.nan  # both sets empty: undefined
+        return np.nan
 
     return float(2.0 * intersection / denom)
 
@@ -94,7 +94,6 @@ def rank_resilience(
         return np.nan
 
     if np.std(scores_sample) == 0 or np.std(scores_full_restricted) == 0:
-        # Constant scores: Spearman undefined; treat as nan
         return np.nan
 
     result = stats.spearmanr(scores_sample, scores_full_restricted)

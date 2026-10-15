@@ -22,7 +22,6 @@ from omegaconf import OmegaConf
 
 PROJECT = Path(__file__).resolve().parents[2]
 
-# Condition columns that define one "cell" beyond (dataset, method); rep is the replicate index.
 COND_COLS = ["tier", "p", "k", "K", "threshold_pct", "part", "n_vs_psi", "d"]
 METRIC_COLS = ["rho", "rho_tilde", "rho_srs", "rho_str", "rho_cluster"]
 
@@ -60,7 +59,6 @@ def summarize(path: Path, rep_col: str) -> list[str]:
     if rep_col in df.columns and keys:
         dup = int(df.duplicated(keys + [rep_col]).sum())
         out.append(f"- duplicate (keys+{rep_col}) rows: {dup:,}")
-        # completeness: each cell against the modal replicate count of its own experiment/tier
         cells = df.groupby(keys, dropna=False)[rep_col].nunique()
         group = [c for c in ["tier"] if c in keys]
         if group:
@@ -95,7 +93,7 @@ def main(cfg: RootConfig) -> None:
         for f in sorted(r.rglob("*.csv")) if r.exists() else []:
             try:
                 lines += summarize(f, cfg.inv.rep_col)
-            except Exception as e:  # abort-loud per file, keep scanning others
+            except Exception as e:
                 lines += [f"### `{f}` — FAILED TO PARSE: {e}", ""]
     for root in cfg.inv.tables_roots:
         r = PROJECT / root

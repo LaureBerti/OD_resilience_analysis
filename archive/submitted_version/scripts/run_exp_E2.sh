@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# run_exp_E2.sh — E2 Convergence Rate Fitting
-# Usage: bash run_exp_E2.sh [--dry-run]
 
 set -euo pipefail
 

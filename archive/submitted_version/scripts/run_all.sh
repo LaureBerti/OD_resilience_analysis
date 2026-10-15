@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-# run_all.sh — Run all experiments E1 through E5 sequentially.
-#
-# Usage:
-#   bash run_all.sh              # run all experiments
-#   bash run_all.sh --skip-e5    # skip large-scale experiment
-#   bash run_all.sh --dry-run    # print what would be done
-#
-# Expected total runtime: 8-24 hours (E5 dominates).
-# E1 + E2 + E3 + E4 typically complete in 2-4 hours.
 
 set -euo pipefail
 
@@ -25,7 +16,6 @@ for arg in "$@"; do
     esac
 done
 
-# Activate virtual environment if present
 VENV_CANDIDATES=(
     "${SCRIPT_DIR}/../../../../.venv/bin/activate"
     "${SCRIPT_DIR}/../../../../venv/bin/activate"
@@ -39,7 +29,6 @@ for candidate in "${VENV_CANDIDATES[@]}"; do
     fi
 done
 
-# Check Python dependencies
 echo "Checking Python environment..."
 python -c "import pyod, numpy, pandas, scipy, sklearn, matplotlib, seaborn, tqdm" 2>/dev/null || {
     echo "ERROR: Missing Python dependencies."
@@ -58,7 +47,6 @@ echo "======================================"
 
 T_TOTAL_START=$(python -c "import time; print(time.perf_counter())")
 
-# ---- E1 ----
 echo ""
 echo "[$(date)] Starting E1..."
 if [ "$DRY_RUN" = "1" ]; then
@@ -68,7 +56,6 @@ else
 fi
 echo "[$(date)] E1 done."
 
-# ---- E2 ----
 echo ""
 echo "[$(date)] Starting E2..."
 if [ "$DRY_RUN" = "1" ]; then
@@ -78,7 +65,6 @@ else
 fi
 echo "[$(date)] E2 done."
 
-# ---- E3 ----
 echo ""
 echo "[$(date)] Starting E3..."
 if [ "$DRY_RUN" = "1" ]; then
@@ -88,7 +74,6 @@ else
 fi
 echo "[$(date)] E3 done."
 
-# ---- E4 ----
 echo ""
 echo "[$(date)] Starting E4..."
 if [ "$DRY_RUN" = "1" ]; then
@@ -98,7 +83,6 @@ else
 fi
 echo "[$(date)] E4 done."
 
-# ---- E5 ----
 if [ "$SKIP_E5" = "0" ]; then
     echo ""
     echo "[$(date)] Starting E5 (large-scale, may take several hours)..."
@@ -113,7 +97,6 @@ else
     echo "[$(date)] E5 SKIPPED (--skip-e5)."
 fi
 
-# ---- E6 ----
 echo ""
 echo "[$(date)] Starting E6 (stratified vs. SRSWOR, ~30-60 min)..."
 if [ "$DRY_RUN" = "1" ]; then
@@ -123,7 +106,6 @@ else
 fi
 echo "[$(date)] E6 done."
 
-# ---- E7 ----
 echo ""
 echo "[$(date)] Starting E7 (cluster sampling, ~60-120 min)..."
 if [ "$DRY_RUN" = "1" ]; then

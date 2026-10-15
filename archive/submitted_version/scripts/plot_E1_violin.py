@@ -26,9 +26,6 @@ RESULTS_DIR = OUTPUT_DIR / "results"
 FIGURES_DIR = OUTPUT_DIR / "figures"
 FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
-# ---------------------------------------------------------------------------
-# Plot styling
-# ---------------------------------------------------------------------------
 plt.rcParams.update({
     "font.family": "serif",
     "font.size": 11,
@@ -41,10 +38,10 @@ plt.rcParams.update({
 })
 
 CLASS_COLORS = {
-    "I":   "#2166ac",   # blue
-    "II":  "#4dac26",   # green
-    "III": "#e08214",   # orange
-    "IV":  "#d73027",   # red
+    "I":   "#2166ac",
+    "II":  "#4dac26",
+    "III": "#e08214",
+    "IV":  "#d73027",
 }
 
 CLASS_LABELS = {
@@ -79,7 +76,6 @@ def plot_violin(df: pd.DataFrame) -> None:
         widths=0.7,
     )
 
-    # Color each violin
     for i, (body, cls) in enumerate(zip(vp["bodies"], classes)):
         body.set_facecolor(CLASS_COLORS[cls])
         body.set_edgecolor("black")
@@ -90,7 +86,6 @@ def plot_violin(df: pd.DataFrame) -> None:
             vp[part].set_color("black")
             vp[part].set_linewidth(1.5)
 
-    # Add individual jitter points
     rng = np.random.default_rng(0)
     for i, (pos, cls) in enumerate(zip(positions, classes)):
         vals = data_by_class[cls]
@@ -99,7 +94,6 @@ def plot_violin(df: pd.DataFrame) -> None:
             pos + jitter, vals,
             color=CLASS_COLORS[cls], alpha=0.2, s=3, zorder=2
         )
-        # Add mean marker
         ax.scatter(pos, np.nanmean(vals), marker="D", color="white",
                    edgecolor="black", s=50, zorder=5)
 
@@ -116,7 +110,6 @@ def plot_violin(df: pd.DataFrame) -> None:
     )
     ax.grid(axis="y", alpha=0.3)
 
-    # Kruskal-Wallis annotation — top-left to avoid overlap with violins
     from scipy import stats
     groups = [data_by_class[c] for c in classes]
     h_stat, p_val = stats.kruskal(*groups)

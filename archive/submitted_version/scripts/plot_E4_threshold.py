@@ -78,7 +78,6 @@ def plot_threshold_sensitivity(thresh_df: pd.DataFrame, df_raw: pd.DataFrame) ->
     For each dataset in Part B: rho vs threshold_pct, with rho_tilde as horizontal line.
     """
     if len(thresh_df) == 0:
-        # Fall back to raw data
         if "part" in df_raw.columns:
             part_b = df_raw[df_raw["part"] == "B"]
         else:
@@ -113,9 +112,8 @@ def plot_threshold_sensitivity(thresh_df: pd.DataFrame, df_raw: pd.DataFrame) ->
                 continue
 
             sub = sub.sort_values("threshold_pct")
-            threshold_pct = sub["threshold_pct"].values * 100  # convert to %
+            threshold_pct = sub["threshold_pct"].values * 100
 
-            # rho line (varies with threshold)
             ax.plot(
                 threshold_pct, sub["mean_rho"].values,
                 color=METHOD_COLORS.get(method, "steelblue"),
@@ -123,7 +121,6 @@ def plot_threshold_sensitivity(thresh_df: pd.DataFrame, df_raw: pd.DataFrame) ->
                 label="ρ (Dice)"
             )
 
-            # rho_tilde: constant or near-constant (horizontal reference)
             rho_tilde_mean = sub["mean_rho_tilde"].mean()
             ax.axhline(
                 y=rho_tilde_mean,
@@ -132,7 +129,6 @@ def plot_threshold_sensitivity(thresh_df: pd.DataFrame, df_raw: pd.DataFrame) ->
                 label=f"ρ̃ = {rho_tilde_mean:.2f}"
             )
 
-            # Shade the gap
             y_rho = sub["mean_rho"].values
             x = threshold_pct
             ax.fill_between(
@@ -176,7 +172,6 @@ def plot_threshold_sensitivity(thresh_df: pd.DataFrame, df_raw: pd.DataFrame) ->
 def plot_rho_comparison_bar(wilcoxon_df: pd.DataFrame, df_raw: pd.DataFrame) -> None:
     """Bar chart: mean rho and rho_tilde per method, with error bars."""
     if len(wilcoxon_df) == 0:
-        # Compute from raw
         part_a = df_raw[df_raw.get("part", "A") == "A"] if "part" in df_raw.columns else df_raw
         agg = part_a.groupby("method").agg(
             mean_rho=("rho", "mean"),
@@ -190,7 +185,6 @@ def plot_rho_comparison_bar(wilcoxon_df: pd.DataFrame, df_raw: pd.DataFrame) -> 
         print("No comparison data for bar chart.")
         return
 
-    # Load method class info
     try:
         sys.path.insert(0, str(SCRIPT_DIR))
         from method_wrappers import METHOD_CLASS_MAP
@@ -213,7 +207,6 @@ def plot_rho_comparison_bar(wilcoxon_df: pd.DataFrame, df_raw: pd.DataFrame) -> 
     bars2 = ax.bar(x + width / 2, rho_tilde_vals, width, label="ρ̃ (rank)", color=colors, alpha=0.45,
                    edgecolor="black", hatch="//")
 
-    # P-value annotations
     if "wilcoxon_p" in wilcoxon_df.columns:
         for i, (m, p_val) in enumerate(zip(methods, wilcoxon_df["wilcoxon_p"].values)):
             if not np.isnan(p_val):
@@ -234,7 +227,6 @@ def plot_rho_comparison_bar(wilcoxon_df: pd.DataFrame, df_raw: pd.DataFrame) -> 
     ax.legend(fontsize=16)
     ax.grid(axis="y", alpha=0.3)
 
-    # Class dividers
     prev_class = None
     for i, m in enumerate(methods):
         cls = METHOD_CLASS_MAP.get(m, "?")

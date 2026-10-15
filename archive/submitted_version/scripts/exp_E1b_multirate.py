@@ -31,9 +31,6 @@ warnings.filterwarnings("ignore", message="Precision loss occurred in moment cal
 import numpy as np
 import pandas as pd
 
-# ---------------------------------------------------------------------------
-# Path setup — allow running from any directory
-# ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = SCRIPT_DIR.parent
 RESULTS_DIR = OUTPUT_DIR / "results"
@@ -50,9 +47,6 @@ from method_wrappers import make_detector, METHOD_CLASS_MAP, ALL_METHODS
 from resilience_metrics import compute_resilience_pair
 
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 P_VALUES = [0.01, 0.05, 0.10]
 N_REPS = 20
 CONTAMINATION = 0.10
@@ -61,13 +55,9 @@ N_MAX_FULL = 5000
 
 E1B_DATASETS = TIER1_DATASETS + TIER2_DATASETS + TIER3_DATASETS
 
-# Exclude AutoEncoder (torch not available)
 E1B_METHODS = [m for m in ALL_METHODS if m != "AutoEncoder"]
 
 
-# ---------------------------------------------------------------------------
-# Core computation
-# ---------------------------------------------------------------------------
 
 def run_single_condition(
     X: np.ndarray,
@@ -130,7 +120,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
         tier = DATASET_TIERS.get(ds_name, "?")
         t_dataset_start = time.perf_counter()
 
-        # Cap large datasets for computational feasibility
         n_orig = len(X)
         if n_orig > N_MAX_FULL:
             rng_cap = np.random.default_rng(BASE_SEED)
@@ -176,12 +165,10 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
 
 def save_results(df: pd.DataFrame) -> None:
     """Save raw results and aggregated summary table."""
-    # Raw results
     raw_path = RESULTS_DIR / "e1b_raw_results.csv"
     df.to_csv(raw_path, index=False)
     print(f"Raw results saved: {raw_path}")
 
-    # Summary: mean rho by method_class × p
     summary = (
         df.groupby(["method_class", "p"])
         .agg(
@@ -199,9 +186,6 @@ def save_results(df: pd.DataFrame) -> None:
     return summary
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main():
     print("=" * 60)
@@ -224,7 +208,6 @@ def main():
     df = run_experiment(datasets)
     summary = save_results(df)
 
-    # Print 4×3 summary table (class × p)
     print("\n" + "=" * 60)
     print("Summary: mean rho by class × p")
     print("=" * 60)

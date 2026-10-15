@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# run_exp_E4.sh — E4 Rank-Based vs Dice-Based Resilience
-# Usage: bash run_exp_E4.sh [--dry-run]
 
 set -euo pipefail
 

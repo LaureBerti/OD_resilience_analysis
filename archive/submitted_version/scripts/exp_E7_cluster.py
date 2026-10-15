@@ -83,28 +83,21 @@ from data_loader import (
 from method_wrappers import make_detector, METHOD_CLASS_MAP
 from resilience_metrics import compute_resilience_pair
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 P_VALUES     = [0.05, 0.10, 0.20]
-K_VALUES     = [5, 10, 20]   # number of clusters
+K_VALUES     = [5, 10, 20]
 N_REPS_T2    = 30
 N_REPS_T3    = 10
 CONTAMINATION = 0.10
 BASE_SEED    = 42
 
-# Class I + II (theorem applies) + III (check) + LOF T2 only (negative control)
 E7_METHODS_ALL  = ["ThreeSigma", "BoxPlot", "MAD", "ChiSquare",
                    "COPOD", "ECOD", "HBOS",
                    "IForest"]
-E7_METHODS_T2_EXTRA = ["LOF"]  # LOF only for Tier 2 (N <= 10K)
+E7_METHODS_T2_EXTRA = ["LOF"]
 
 E7_DATASETS = TIER2_DATASETS + TIER3_DATASETS
 
 
-# ---------------------------------------------------------------------------
-# ICC and DEFF estimation
-# ---------------------------------------------------------------------------
 
 def estimate_icc_deff(
     X: np.ndarray,
@@ -137,7 +130,6 @@ def estimate_icc_deff(
     for j in range(d):
         xj = X[:, j]
         grand_mean = np.mean(xj)
-        # Between-cluster sum of squares
         msb = 0.0
         msw = 0.0
         total_within = 0
@@ -155,17 +147,15 @@ def estimate_icc_deff(
 
         n_clusters_nonempty = len(cluster_sizes)
         if n_clusters_nonempty < 2 or total_within <= n_clusters_nonempty:
-            continue  # degenerate
+            continue
 
         msb /= (n_clusters_nonempty - 1)
         msw /= (total_within - n_clusters_nonempty)
 
         if msw < 1e-12:
-            # Constant within clusters => ICC = 1
             icc_j = 1.0
         else:
-            # ANOVA-based ICC estimator
-            m0 = m  # use target m (average sample size)
+            m0 = m
             icc_j = (msb - msw) / (msb + (m0 - 1) * msw)
 
         icc_j = float(np.clip(icc_j, -1.0, 1.0))
@@ -176,13 +166,10 @@ def estimate_icc_deff(
 
     rho_icc = float(np.mean(icc_per_feature))
     deff    = 1.0 + (m - 1) * rho_icc
-    deff    = float(np.clip(deff, 0.01, None))  # DEFF >= 0
+    deff    = float(np.clip(deff, 0.01, None))
     return rho_icc, deff
 
 
-# ---------------------------------------------------------------------------
-# Cluster sampling
-# ---------------------------------------------------------------------------
 
 def cluster_sample(
     X: np.ndarray,
@@ -213,19 +200,17 @@ def cluster_sample(
     """
     N = len(X)
     K_eff = min(K, N // 2)
-    m_target = n / K_eff  # target records per cluster (float)
+    m_target = n / K_eff
 
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     km = KMeans(n_clusters=K_eff, random_state=seed, n_init=10)
     cluster_labels = km.fit_predict(X_scaled)
 
-    # Proportionate within-cluster SRSWOR
     sampled_indices = []
     for h in range(K_eff):
         idx_h = np.where(cluster_labels == h)[0]
         N_h   = len(idx_h)
-        # Proportionate allocation: m_h = round(n * N_h / N)
         m_h   = max(1, round(n * N_h / N))
         m_h   = min(m_h, N_h)
         sampled_h = rng.choice(idx_h, size=m_h, replace=False)
@@ -233,7 +218,6 @@ def cluster_sample(
 
     all_idx = np.concatenate(sampled_indices)
 
-    # Adjust to exactly n via random trimming / padding
     if len(all_idx) > n:
         all_idx = rng.choice(all_idx, size=n, replace=False)
     elif len(all_idx) < n:
@@ -246,15 +230,11 @@ def cluster_sample(
 
     all_idx = np.sort(all_idx)
 
-    # Estimate ICC and DEFF on full population clusters
     rho_icc, deff = estimate_icc_deff(X, cluster_labels, K_eff, m_target)
 
     return all_idx, cluster_labels, rho_icc, deff
 
 
-# ---------------------------------------------------------------------------
-# Core computation
-# ---------------------------------------------------------------------------
 
 def run_single_condition(
     X: np.ndarray,
@@ -272,7 +252,7 @@ def run_single_condition(
     rng  = np.random.default_rng(BASE_SEED + rep)
     seed = BASE_SEED + rep
     N    = len(X)
-    n    = max(K + 1, int(np.floor(p * N)))   # ensure n >= K
+    n    = max(K + 1, int(np.floor(p * N)))
 
     row = {
         "method":          method_name,
@@ -282,13 +262,10 @@ def run_single_condition(
         "n_full":          N,
         "n_sample_target": n,
         "n_sample_actual": np.nan,
-        # SRSWOR arm
         "rho_srs":         np.nan,
         "rho_tilde_srs":   np.nan,
-        # Cluster arm
         "rho_cluster":     np.nan,
         "rho_tilde_cluster": np.nan,
-        # ICC / DEFF diagnostics
         "rho_icc":         np.nan,
         "deff":            np.nan,
         "time_total_s":    np.nan,
@@ -297,12 +274,10 @@ def run_single_condition(
 
     t0 = time.perf_counter()
     try:
-        # Fit on full dataset once; reuse scores for both arms
         det_full = make_detector(method_name, contamination=contamination, random_state=seed)
         det_full.fit(X)
         scores_full = det_full.decision_function(X)
 
-        # --- SRSWOR arm ---
         idx_srs = np.sort(rng.choice(N, size=n, replace=False))
         det_srs = make_detector(method_name, contamination=contamination, random_state=seed)
         det_srs.fit(X[idx_srs])
@@ -311,7 +286,6 @@ def run_single_condition(
         row["rho_srs"]       = m_srs["rho"]
         row["rho_tilde_srs"] = m_srs["rho_tilde"]
 
-        # --- Cluster arm ---
         idx_cl, cl_labels, rho_icc, deff = cluster_sample(X, n, K, rng, seed)
         row["n_sample_actual"] = len(idx_cl)
         row["rho_icc"]         = rho_icc
@@ -358,7 +332,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
                         row["method_class"] = cls
                         all_records.append(row)
 
-            # Summary
             subset = [r for r in all_records
                       if r["dataset"] == ds_name and r["method"] == method_name]
             mean_delta = np.nanmean([
@@ -379,9 +352,6 @@ def run_experiment(datasets: dict) -> pd.DataFrame:
     return pd.DataFrame(all_records)
 
 
-# ---------------------------------------------------------------------------
-# Statistical analysis
-# ---------------------------------------------------------------------------
 
 def compute_delta_rho_table(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -399,7 +369,6 @@ def compute_delta_rho_table(df: pd.DataFrame) -> pd.DataFrame:
         std_d  = float(per_ds.std())  if n_ds > 0 else np.nan
         mean_deff = float(grp["deff"].mean())
 
-        # H0: Delta_rho >= 0  (one-sided, direction = "less" means cluster is worse)
         wx_stat, wx_p = np.nan, np.nan
         if n_ds >= 4:
             try:
@@ -454,9 +423,6 @@ def run_statistical_tests(df: pd.DataFrame) -> None:
     print(f"\nDEFF summary saved: {deff_path}")
 
 
-# ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
 
 def make_plots(df: pd.DataFrame) -> None:
     """
@@ -485,13 +451,11 @@ def make_plots(df: pd.DataFrame) -> None:
 
     CLASS_COLORS = {"I": "#4878CF", "II": "#D65F5F", "III": "#6ACC65", "IV": "#B47CC7"}
 
-    # --- Scatter plot: Delta_rho vs. DEFF ---
     fig, ax = plt.subplots(figsize=(7, 5))
     for cls, grp in df.groupby("method_class"):
         color = CLASS_COLORS.get(cls, "grey")
         ax.scatter(grp["deff"], grp["delta_rho"],
                    alpha=0.3, s=12, color=color, label=f"Class {cls}")
-        # Regression line
         if len(grp) >= 5:
             try:
                 slope, intercept, r, p_val, _ = linregress(grp["deff"], grp["delta_rho"])
@@ -516,10 +480,8 @@ def make_plots(df: pd.DataFrame) -> None:
     plt.close(fig)
     print(f"Figure saved: {fpath}")
 
-    # --- Boxplot: Delta_rho by K ---
     K_vals   = sorted(df["K"].unique())
     methods  = (E7_METHODS_ALL + E7_METHODS_T2_EXTRA)
-    # Filter to methods present in data
     methods = [m for m in methods if m in df["method"].unique()]
 
     fig, axes = plt.subplots(1, len(K_vals), figsize=(4 * len(K_vals), 5), sharey=True)
@@ -564,9 +526,6 @@ def make_plots(df: pd.DataFrame) -> None:
     print(f"Figure saved: {fpath}")
 
 
-# ---------------------------------------------------------------------------
-# Save outputs
-# ---------------------------------------------------------------------------
 
 def save_results(df: pd.DataFrame) -> None:
     raw_path = RESULTS_DIR / "e7_raw_results.csv"
@@ -582,9 +541,6 @@ def save_results(df: pd.DataFrame) -> None:
         df_timing.to_csv(timing_path, index=False)
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     print("=" * 65)

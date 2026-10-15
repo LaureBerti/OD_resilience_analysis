@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# run_exp_E6.sh — E6: Stratified vs. SRSWOR Sampling
-# Usage: bash run_exp_E6.sh [--dry-run]
 
 set -euo pipefail
 
@@ -23,7 +21,6 @@ for arg in "$@"; do
     fi
 done
 
-# Preflight: verify required packages
 python -c "import pyod, numpy, pandas, scipy, sklearn, matplotlib" 2>/dev/null || {
     echo "ERROR: Missing Python dependencies (pyod not found)."
     echo "Run: source .venv/bin/activate && pip install pyod"

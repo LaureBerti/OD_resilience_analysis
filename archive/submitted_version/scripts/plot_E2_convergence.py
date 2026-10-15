@@ -68,7 +68,6 @@ def plot_loglog_convergence(df: pd.DataFrame, alpha_df: pd.DataFrame) -> None:
     """Log-log plot of mean(1-rho) vs n for Part A methods."""
     df_a = df[df.get("part", df["method"].isin(["MAD", "ECOD", "LOF"])) == "A"].copy()
     if len(df_a) == 0:
-        # Fall back: use Part A methods regardless of 'part' column
         df_a = df[df["method"].isin(["MAD", "ECOD", "LOF"])].copy()
 
     methods = ["MAD", "ECOD", "LOF"]
@@ -79,7 +78,6 @@ def plot_loglog_convergence(df: pd.DataFrame, alpha_df: pd.DataFrame) -> None:
         if len(sub) == 0:
             continue
 
-        # Mean (1-rho) per n
         mean_by_n = sub.groupby("n_sample")["rho"].mean().reset_index()
         mean_by_n["one_minus_rho"] = 1.0 - mean_by_n["rho"]
         mean_by_n = mean_by_n[mean_by_n["one_minus_rho"] > 0]
@@ -96,12 +94,10 @@ def plot_loglog_convergence(df: pd.DataFrame, alpha_df: pd.DataFrame) -> None:
             linewidth=1.5, alpha=0.5
         )
 
-        # Fitted line from alpha_df
         if len(alpha_df) > 0:
             method_alphas = alpha_df[alpha_df["method"] == method]
             if len(method_alphas) > 0:
                 alpha_mean = method_alphas["alpha_hat"].mean()
-                # Fit intercept from data
                 log_n = np.log(mean_by_n["n_sample"].values)
                 log_res = np.log(mean_by_n["one_minus_rho"].values)
                 valid = np.isfinite(log_n) & np.isfinite(log_res)
@@ -129,7 +125,6 @@ def plot_loglog_convergence(df: pd.DataFrame, alpha_df: pd.DataFrame) -> None:
               borderaxespad=0, frameon=True)
     ax.grid(True, which="both", alpha=0.3)
 
-    # Reference slope annotations
     n_ref = np.array([100, 10000])
     ax.plot(n_ref, 2 * n_ref ** (-0.5), "k:", alpha=0.5, linewidth=1)
     ax.text(10000, 2 * 10000 ** (-0.5) * 1.5, "slope −0.5", fontsize=8, color="gray")
@@ -171,7 +166,6 @@ def plot_iforest_phase_transition(df: pd.DataFrame) -> None:
             color=color, alpha=0.15
         )
 
-    # Phase-transition vertical line
     ax.axvline(x=PSI, color="black", linestyle="--", linewidth=2, alpha=0.8)
     ax.text(
         PSI * 1.05, 0.15,
