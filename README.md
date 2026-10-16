@@ -85,8 +85,11 @@ data/                                datasets (downloaded, not versioned)
 brew install cmake            # macOS; on Linux use the system package manager
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt        # or requirements-lock.txt for exact pins
+pip install -r requirements.txt
 ```
+
+`requirements-lock.txt` lists the exact versions used for the paper (Python 3.13.7); with these
+versions PyOD 0.9.9 and combo were installed without their dependencies, as in Option B.
 
 ### Option B — cmake-free install (macOS + Python 3.13)
 
@@ -126,8 +129,8 @@ The 16 datasets, by size tier:
 Substitutions vs. the original plan (ADBench availability): `vertebral` for arrhythmia;
 `smtp`/`skin`/full-scale `covertype` for the large-scale sets.
 **E1, E1b and E4** use all 16; **E5** uses the three largest (covertype, skin, smtp) at full size;
-the other experiments are listed in Table 3 of the paper. **E2** also uses 13 further datasets
-(`python revision/code/download_extra_datasets.py`).
+the other experiments are listed in Table 3 of the paper. **E2** also uses 13 further ODDS/ADBench datasets, as distributed with the ADOD code, of which the 9 with at
+least 5,000 records are also used in **E2b** (`python revision/code/download_extra_datasets.py`).
 
 > `data/*.npz` are git-ignored. The per-replicate results in `revision/experiments/*/raw/` let you
 > reproduce every table and figure without re-running the experiments.
@@ -182,10 +185,12 @@ This repository is the data-availability record for the paper.
 - **Derived data** (the per-replicate resilience results underlying every table and figure of the
   paper): `revision/experiments/*/raw/*.csv`, with derived tables in `revision/experiments/*/tables/`,
   regenerated deterministically (fixed seeds) by `revision/code/`.
-- **Benchmark datasets** (16 core datasets, plus 13 used only in E2): existing public third-party data from
-  [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`);
-  fetch with `python download_datasets.py`. Full-scale Covertype/Skin also at the
-  [UCI ML Repository](https://archive.ics.uci.edu/).
+- **Benchmark datasets** (16 core datasets, plus 13 used in E2 and E2b): existing public third-party data.
+  The 16 core datasets come from [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`;
+  fetch with `python download_datasets.py`; full-scale Covertype/Skin also at the
+  [UCI ML Repository](https://archive.ics.uci.edu/)). The 13 further datasets are the ODDS/ADBench copies
+  distributed with the ADOD code (https://github.com/Qian-Lily/ADOD; fetch with
+  `python revision/code/download_extra_datasets.py`).
 - **Persistent identifier:** this repository is archived on Zenodo; the concept DOI
   **`10.5281/zenodo.20829792`** (https://doi.org/10.5281/zenodo.20829792) resolves to the latest
   version, and each version also has its own DOI.

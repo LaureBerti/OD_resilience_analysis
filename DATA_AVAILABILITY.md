@@ -10,7 +10,7 @@ There are two kinds of data:
    figure of the paper. These are in `revision/experiments/*/raw/`, with the derived tables
    in `revision/experiments/*/tables/` and the Supporting Information tables in `revision/SI/`.
 2. **Existing third-party benchmark data** — 29 public outlier-detection datasets (16 core
-   datasets from ADBench, and 13 further ODDS/ADBench datasets used only in experiment E2).
+   datasets from ADBench, and 13 further ODDS/ADBench datasets used in experiments E2 and E2b).
    They are not redistributed here (they are git-ignored) but are downloaded on demand from
    their public sources by `download_datasets.py` and `revision/code/download_extra_datasets.py`.
 
@@ -81,7 +81,7 @@ UCI Machine Learning Repository: <https://archive.ics.uci.edu/>.
 
 ---
 
-The 13 further datasets of E2 (Cardio, Vowels, Waveform, Speech, PageBlocks, Satimage-2, MNIST,
+The 13 further datasets of E2 and E2b (Cardio, Vowels, Waveform, Speech, PageBlocks, Satimage-2, MNIST,
 Mammography, Magic gamma, Campaign, CelebA, Fraud, HTTP) are the ODDS/ADBench copies distributed with
 the ADOD code (https://github.com/Qian-Lily/ADOD, commit `dc76889`), fetched by
 `revision/code/download_extra_datasets.py`.

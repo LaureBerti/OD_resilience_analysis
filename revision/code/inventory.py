@@ -29,7 +29,10 @@ METRIC_COLS = ["rho", "rho_tilde", "rho_srs", "rho_str", "rho_cluster"]
 @dataclass
 class InvConfig:
     results_roots: list = field(default_factory=lambda: ["github_repo/results", "revision/experiments"])
-    tables_roots: list = field(default_factory=lambda: ["github_repo/tables", "revision/experiments/tables"])
+    tables_roots: list = field(default_factory=lambda: ["github_repo/tables", "revision/experiments/*/tables"])
+    expected_reps: dict = field(default_factory=lambda: {"E1": 50, "E1b": 20, "E2": 30, "E2b1000": 30, "E2b2000": 30,
+                                                         "E2b5000": 30, "E3": 30, "E5": 10, "X5": 20, "X6": 30,
+                                                         "X7": 30})
     out_md: str = "revision/inventory.md"
     rep_col: str = "rep"
 
@@ -42,7 +45,7 @@ class RootConfig:
 ConfigStore.instance().store(name="inventory", node=RootConfig)
 
 
-def summarize(path: Path, rep_col: str) -> list[str]:
+def summarize(path: Path, rep_col: str, expected_reps: dict) -> list[str]:
     df = pd.read_csv(path, low_memory=False)
     out = [f"### `{path.relative_to(PROJECT)}` — {len(df):,} rows, {df.shape[1]} cols", ""]
     cond = [c for c in COND_COLS if c in df.columns]
@@ -68,6 +71,11 @@ def summarize(path: Path, rep_col: str) -> list[str]:
         short = cells[cells < expected]
         out.append(f"- cells: {len(cells):,}; reps/cell min={cells.min()} max={cells.max()}; "
                    f"cells below their group's max: {len(short):,}")
+        parts = path.relative_to(PROJECT).parts
+        exp = parts[parts.index("experiments") + 1] if "experiments" in parts else None
+        if exp in expected_reps:
+            below = cells[cells < expected_reps[exp]]
+            out.append(f"- declared replicates for {exp}: {expected_reps[exp]}; cells below it: {len(below):,}")
         if len(short):
             out.append("  - short cells (first 15): " + "; ".join(
                 f"{k}={v}" for k, v in list(short.items())[:15]))
@@ -92,15 +100,16 @@ def main(cfg: RootConfig) -> None:
         lines.append("")
         for f in sorted(r.rglob("*.csv")) if r.exists() else []:
             try:
-                lines += summarize(f, cfg.inv.rep_col)
+                lines += summarize(f, cfg.inv.rep_col, dict(cfg.inv.expected_reps))
             except Exception as e:
                 lines += [f"### `{f}` — FAILED TO PARSE: {e}", ""]
     for root in cfg.inv.tables_roots:
-        r = PROJECT / root
-        lines.append(f"## Tables root `{root}`" + ("" if r.exists() else " — (absent)"))
-        for f in sorted(r.glob("*.csv")) if r.exists() else []:
-            n = len(pd.read_csv(f))
-            lines.append(f"- `{f.name}` ({n} rows)")
+        dirs = sorted(d for d in PROJECT.glob(root) if d.is_dir())
+        lines.append(f"## Tables root `{root}`" + ("" if dirs else " — (absent)"))
+        for d in dirs:
+            for f in sorted(d.glob("*.csv")):
+                n = len(pd.read_csv(f))
+                lines.append(f"- `{f.relative_to(PROJECT)}` ({n} rows)")
         lines.append("")
     out = PROJECT / cfg.inv.out_md
     out.write_text("\n".join(lines))

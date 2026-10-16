@@ -133,6 +133,23 @@ def e2(c):
     print(fb.round(3).to_string())
 
 
+def two_stage(t, xs, min_cells=4):
+    import statsmodels.api as sm
+    coefs = []
+    for _, u in t.groupby("dataset"):
+        if len(u) < min_cells or any(u[x].nunique() < 2 for x in xs):
+            continue
+        f = sm.OLS(u["y"], sm.add_constant(u[list(xs)])).fit()
+        coefs.append(f.params[list(xs)])
+    C = pd.DataFrame(coefs)
+    res = {}
+    for x in xs:
+        v = C[x].values; k = len(v); m = v.mean(); se = v.std(ddof=1) / np.sqrt(k)
+        q = stats.t.ppf(0.975, k - 1)
+        res[x] = dict(coef=m, lo=m - q * se, hi=m + q * se, p=2 * stats.t.sf(abs(m / se), k - 1), k=k)
+    return res
+
+
 def e2b(c):
     parts = []
     for Nr in (1000, 2000, 5000):
@@ -148,14 +165,16 @@ def e2b(c):
     rows = []
     for m, t in g.groupby("method"):
         t = t[t.rho < 1]
+        ts = two_stage(t, ("logn", "logp"))
         mm = smf.mixedlm("y ~ logn + logp", t, groups=t["dataset"]).fit(reml=True)
         ci = mm.conf_int()
-        rows.append(dict(method=m, method_class=t.method_class.iloc[0],
-                         coef_logn=mm.params["logn"], n_lo=ci.loc["logn", 0], n_hi=ci.loc["logn", 1],
-                         ci_n=f"[{ci.loc['logn',0]:.3f}, {ci.loc['logn',1]:.3f}]",
-                         p_logn=mm.pvalues["logn"], coef_logp=mm.params["logp"], p_lo=ci.loc["logp", 0],
-                         p_hi=ci.loc["logp", 1], ci_p=f"[{ci.loc['logp',0]:.3f}, {ci.loc['logp',1]:.3f}]",
-                         p_logp=mm.pvalues["logp"], n_datasets=t.dataset.nunique(), converged=mm.converged))
+        a, b = ts["logn"], ts["logp"]
+        rows.append(dict(method=m, method_class=t.method_class.iloc[0], model="two-stage: per-dataset OLS, t-interval over datasets",
+                         coef_logn=a["coef"], n_lo=a["lo"], n_hi=a["hi"], ci_n=f"[{a['lo']:.3f}, {a['hi']:.3f}]",
+                         p_logn=a["p"], coef_logp=b["coef"], p_lo=b["lo"], p_hi=b["hi"],
+                         ci_p=f"[{b['lo']:.3f}, {b['hi']:.3f}]", p_logp=b["p"], n_datasets=a["k"],
+                         mixed_coef_logn=mm.params["logn"], mixed_ci_n=f"[{ci.loc['logn',0]:.3f}, {ci.loc['logn',1]:.3f}]",
+                         mixed_coef_logp=mm.params["logp"], mixed_ci_p=f"[{ci.loc['logp',0]:.3f}, {ci.loc['logp',1]:.3f}]"))
     r = pd.DataFrame(rows); r.to_csv(EXP / "E2b_n_vs_p.csv", index=False)
     print(r.round(3).to_string())
     names = {"ThreeSigma": "$3\\sigma$"}
@@ -182,9 +201,14 @@ def e3(c):
     import statsmodels.formula.api as smf
     rows = []
     for m, t in g.groupby("method"):
+        t = t[t.rho < 1]
+        ts = two_stage(t, ("logk", "logp")); a, b = ts["logk"], ts["logp"]
         mm = smf.mixedlm("y ~ logk + logp", t, groups=t["dataset"]).fit(reml=True); ci = mm.conf_int()
-        r = dict(method=m, a_logk=mm.params["logk"], ci_k=f"[{ci.loc['logk',0]:.3f}, {ci.loc['logk',1]:.3f}]",
-                 b_logp=mm.params["logp"], ci_p=f"[{ci.loc['logp',0]:.3f}, {ci.loc['logp',1]:.3f}]")
+        r = dict(method=m, model="two-stage: per-dataset OLS, t-interval over datasets", n_datasets=a["k"],
+                 a_logk=a["coef"], ci_k=f"[{a['lo']:.3f}, {a['hi']:.3f}]", p_logk=a["p"],
+                 b_logp=b["coef"], ci_p=f"[{b['lo']:.3f}, {b['hi']:.3f}]", p_logp=b["p"],
+                 mixed_a_logk=mm.params["logk"], mixed_ci_k=f"[{ci.loc['logk',0]:.3f}, {ci.loc['logk',1]:.3f}]",
+                 mixed_b_logp=mm.params["logp"], mixed_ci_p=f"[{ci.loc['logp',0]:.3f}, {ci.loc['logp',1]:.3f}]")
         for x in ("x_old", "x_nh"):
             r2 = [smf.ols(f"one_minus ~ {x}", s).fit().rsquared for _, s in t.groupby("dataset")]
             r[f"median_R2_{x}"] = np.median(r2)

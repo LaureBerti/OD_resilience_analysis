@@ -3,7 +3,7 @@
 (A) 1 - mean rho against n (log-log) per method: median over datasets of the per-dataset mean
     (30 replicates), band = interquartile range over datasets; dotted reference slope -1/2.
 (B) rho against n for IForest and EIF: median and interquartile range over datasets; dashed line n = psi = 256.
-n is binned on a log grid so that datasets of different N can be pooled.
+n is binned on a log grid so that datasets of different N can be pooled; bins holding fewer than min_datasets datasets are omitted.
 Output: revision/revised/figures/Fig2.tif (RGB, LZW, 600 dpi) + Fig2_preview.png
 """
 from __future__ import annotations
@@ -32,19 +32,20 @@ class Cfg:
     exp_dir: str = "revision/experiments/E2"
     out_dir: str = "revision/revised/figures"
     min_n: int = 10
+    min_datasets: int = 12
     dpi: int = 600
 
 
 ConfigStore.instance().store(name="f2", node=Cfg)
 
 
-def summarise(g, col, bins):
+def summarise(g, col, bins, min_datasets):
     g = g.assign(nb=pd.cut(g.n, bins, labels=np.sqrt(bins[:-1] * bins[1:])))
     g = g.groupby(["method", "nb", "dataset"], observed=True)[col].mean().reset_index()
     s = g.groupby(["method", "nb"], observed=True)[col].agg(
         med="median", lo=lambda x: x.quantile(0.25), hi=lambda x: x.quantile(0.75), k="count").reset_index()
     s["nb"] = s.nb.astype(float)
-    return s[s.k >= 3]
+    return s[s.k >= min_datasets]
 
 
 @hydra.main(version_base=None, config_name="f2")
@@ -57,7 +58,7 @@ def main(c: Cfg) -> None:
     g["div"] = (1 - g.rho).clip(lower=1e-3)
     bins = np.geomspace(c.min_n, 5000, 12)
     fig, (a, b) = plt.subplots(1, 2, figsize=(7.5, 3.5), gridspec_kw={"wspace": 0.28})
-    s = summarise(g, "div", bins)
+    s = summarise(g, "div", bins, c.min_datasets)
     for m, (lab, col, ls, mk) in STYLE.items():
         t = s[s.method == m]
         if t.empty: continue
@@ -70,7 +71,7 @@ def main(c: Cfg) -> None:
     a.set_xlabel("Sample size $n$"); a.set_ylabel(r"$1-\bar\rho$ (median over datasets)")
     a.legend(ncol=5, fontsize=7, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.2), columnspacing=1.0, handlelength=2.2)
     a.text(-0.02, 1.04, "A", transform=a.transAxes, fontweight="bold", fontsize=10, ha="right")
-    s2 = summarise(g[g.method.isin(["IForest", "EIF"])], "rho", bins)
+    s2 = summarise(g[g.method.isin(["IForest", "EIF"])], "rho", bins, c.min_datasets)
     for m in ["IForest", "EIF"]:
         lab, col, ls, mk = STYLE[m]; t = s2[s2.method == m]
         b.plot(t.nb, t.med, ls=ls, color=col, marker=mk, ms=3, lw=1, label=lab)
