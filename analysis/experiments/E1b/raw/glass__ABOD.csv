@@ -1,0 +1,61 @@
+experiment,dataset,method,method_class,earlier_class,variant,p,rep,seed,N,N_orig,d,tier,n,error,degenerate,nonfinite_D,nonfinite_S,k,ties_S,ties_D,rho,rho_k5,rho_k8,rho_k10,rho_k12,rho_k15,k_S,rho_adapt,rho_def1,rho_tilde,t_fit_D_s,t_fit_S_s
+E1b,glass,ABOD,IV,IV,,0.01,0,42,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,1,43,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,2,44,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,3,45,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,4,46,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,5,47,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,6,48,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,7,49,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,8,50,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,9,51,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,10,52,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,11,53,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,12,54,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,13,55,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,14,56,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,15,57,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,16,58,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,17,59,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,18,60,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.01,19,61,214,214,7,T1,2,"InvalidParameterError: The 'n_neighbors' parameter of NearestNeighbors must be an int in the range [1, inf) or None. Got 0 instead.",,,,,,,,,,,,,,,,,,
+E1b,glass,ABOD,IV,IV,,0.05,0,42,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,0.0,0.709090909090909,8.839997462928295e-07,0.019325303001096472
+E1b,glass,ABOD,IV,IV,,0.05,1,43,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.5878787878787878,,0.006030958000337705
+E1b,glass,ABOD,IV,IV,,0.05,2,44,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,0.0,0.709090909090909,,0.011047956999391317
+E1b,glass,ABOD,IV,IV,,0.05,3,45,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.0,0.0,0.0,0.18787878787878787,,0.006721757003106177
+E1b,glass,ABOD,IV,IV,,0.05,4,46,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,,0.0,0.5030303030303029,,0.010019653011113405
+E1b,glass,ABOD,IV,IV,,0.05,5,47,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3.0,0.6666666666666666,0.5,0.7818181818181817,,0.007349288003752008
+E1b,glass,ABOD,IV,IV,,0.05,6,48,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8545454545454544,,0.006868837997899391
+E1b,glass,ABOD,IV,IV,,0.05,7,49,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,-0.05454545454545454,,0.007714681007200852
+E1b,glass,ABOD,IV,IV,,0.05,8,50,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.5515151515151515,,0.021154987000045367
+E1b,glass,ABOD,IV,IV,,0.05,9,51,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,,0.0,0.7696969696969697,,0.010348944997531362
+E1b,glass,ABOD,IV,IV,,0.05,10,52,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,2.0,1.0,0.6666666666666666,0.9030303030303028,,0.007665461002034135
+E1b,glass,ABOD,IV,IV,,0.05,11,53,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,,0.0,0.3696969696969697,,0.009544144995743409
+E1b,glass,ABOD,IV,IV,,0.05,12,54,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.7333333333333332,,0.01632373599568382
+E1b,glass,ABOD,IV,IV,,0.05,13,55,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3.0,0.6666666666666666,0.0,0.8545454545454544,,0.009550903996569104
+E1b,glass,ABOD,IV,IV,,0.05,14,56,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.7575757575757575,,0.00958848200389184
+E1b,glass,ABOD,IV,IV,,0.05,15,57,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.34545454545454546,,0.008100363993435167
+E1b,glass,ABOD,IV,IV,,0.05,16,58,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.709090909090909,,0.01007978200505022
+E1b,glass,ABOD,IV,IV,,0.05,17,59,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.43030303030303024,,0.008429537003394216
+E1b,glass,ABOD,IV,IV,,0.05,18,60,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,0.0,0.8303030303030302,,0.0454495309968479
+E1b,glass,ABOD,IV,IV,,0.05,19,61,214,214,7,T1,10,,False,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.709090909090909,,0.10040176000620704
+E1b,glass,ABOD,IV,IV,,0.1,0,42,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.6666666666666666,2.0,0.5,0.5,0.7376623376623377,7.33998604118824e-07,0.09585058900120202
+E1b,glass,ABOD,IV,IV,,0.1,1,43,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,0.3333333333333333,2.0,0.5,0.5,0.8402597402597403,,0.05929720599669963
+E1b,glass,ABOD,IV,IV,,0.1,2,44,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,0.6666666666666666,3.0,0.6666666666666666,0.4,0.8714285714285716,,0.030499423010041937
+E1b,glass,ABOD,IV,IV,,0.1,3,45,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.3333333333333333,2.0,0.0,0.0,0.7233766233766233,,0.0682568439951865
+E1b,glass,ABOD,IV,IV,,0.1,4,46,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,0.3333333333333333,1.0,1.0,0.6666666666666666,0.8051948051948051,,0.03740259799815249
+E1b,glass,ABOD,IV,IV,,0.1,5,47,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.6666666666666666,2.0,0.5,0.5,0.8935064935064935,,0.016189913993002847
+E1b,glass,ABOD,IV,IV,,0.1,6,48,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.6666666666666666,4.0,0.75,0.3333333333333333,0.7662337662337663,,0.04431739400024526
+E1b,glass,ABOD,IV,IV,,0.1,7,49,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,0.6666666666666666,0.0,,0.0,0.8194805194805195,,0.014629299999796785
+E1b,glass,ABOD,IV,IV,,0.1,8,50,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.3333333333333333,2.0,0.5,0.5,0.7688311688311688,,0.02328344499983359
+E1b,glass,ABOD,IV,IV,,0.1,9,51,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,0.6666666666666666,0.0,,0.0,0.7324675324675325,,0.030303203006042168
+E1b,glass,ABOD,IV,IV,,0.1,10,52,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.6666666666666666,1.0,0.0,0.0,0.7272727272727273,,0.01978579899878241
+E1b,glass,ABOD,IV,IV,,0.1,11,53,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,1.0,2.0,0.5,0.5,0.7415584415584415,,0.01935916198999621
+E1b,glass,ABOD,IV,IV,,0.1,12,54,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,0.6666666666666666,1.0,1.0,0.6666666666666666,0.8727272727272727,,0.018889251005020924
+E1b,glass,ABOD,IV,IV,,0.1,13,55,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.3333333333333333,4.0,0.75,0.6666666666666666,0.5610389610389611,,0.012407795002218336
+E1b,glass,ABOD,IV,IV,,0.1,14,56,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.3333333333333333,3.0,0.3333333333333333,0.4,0.6675324675324676,,0.029020590998698026
+E1b,glass,ABOD,IV,IV,,0.1,15,57,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,1.0,0.0,0.0,1.0,1.0,0.6666666666666666,3.0,0.6666666666666666,0.8,0.8077922077922077,,0.01309911601128988
+E1b,glass,ABOD,IV,IV,,0.1,16,58,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,0.6666666666666666,1.0,0.0,0.0,0.8831168831168831,,0.029821192001691088
+E1b,glass,ABOD,IV,IV,,0.1,17,59,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,0.6666666666666666,4.0,0.5,0.6666666666666666,0.8415584415584414,,0.015702944991062395
+E1b,glass,ABOD,IV,IV,,0.1,18,60,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.5,1.0,1.0,0.5,0.5,1.0,1.0,1.0,0.6666666666666666,0.8246753246753247,,0.01365193200763315
+E1b,glass,ABOD,IV,IV,,0.1,19,61,214,214,7,T1,21,,False,0.0,0.0,2.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.3333333333333333,3.0,0.3333333333333333,0.0,0.8025974025974025,,0.013395797010161914

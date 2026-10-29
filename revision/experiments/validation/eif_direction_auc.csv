@@ -1,6 +1,0 @@
-dataset,auc_submitted_eif,auc_isotree_eif,auc_iforest
-glass,0.223,0.777,0.781
-breastw,0.021,0.981,0.987
-thyroid,0.06,0.975,0.97
-pendigits,0.049,0.921,0.949
-shuttle,0.008,0.993,0.994

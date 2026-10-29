@@ -11,11 +11,11 @@ Both measures are label-free:
 - **ρ̃ (rank resilience):** Spearman correlation of the two score vectors on the sample.
 
 The code, raw results of every replicate, and scripts that produce every table and figure of the paper
-are in **`revision/`**. `scripts/` holds two files of an earlier version that are still used:
+are in **`analysis/`**. `scripts/` holds two files of an earlier version that are still used:
 `scripts/data_loader.py` loads the data, and `scripts/method_wrappers.py` is the earlier set of detector
-implementations that `revision/code/validate_reimplementations.py` compares with the reference
+implementations that `analysis/code/validate_reimplementations.py` compares with the reference
 implementations. Everything else from the earlier version (its scripts, results, tables and figures)
-is in `archive/submitted_version/`; it is superseded and does not underlie the paper.
+is in `archive/earlier_version/`; it is superseded and does not underlie the paper.
 
 > **Status:** manuscript under review (2026).
 
@@ -31,7 +31,7 @@ is in `archive/submitted_version/`; it is superseded and does not underlie the p
 | **IV** | the k-nearest-neighbour graph | LOF, KNN, ABOD, Feature Bagging, ADOD |
 | **G** | a globally fitted model (not assigned to a class) | k-means scoring, one-class SVM |
 
-Implementations (`revision/code/detectors_v2.py`): PyOD 0.9.9 (COPOD, ECOD, HBOS, ABOD,
+Implementations (`analysis/code/detectors_v2.py`): PyOD 0.9.9 (COPOD, ECOD, HBOS, ABOD,
 Feature Bagging, ROD), scikit-learn (LOF, KNN with the PyOD definition, one-class SVM, Isolation Forest,
 Mahalanobis), isotree
 (Extended Isolation Forest), and a CPU port of the authors' ADOD code
@@ -41,7 +41,7 @@ Mahalanobis), isotree
 ## Repository structure
 
 ```
-revision/
+analysis/
 ├── code/
 │   ├── detectors_v2.py              the 18 detectors (in-sample scores)
 │   ├── datasets_v2.py               datasets, size tiers, synthetic data (E7, E8)
@@ -64,7 +64,7 @@ revision/
 ├── figures/                         Fig1.tif, Fig2.tif
 └── run_all.sh                       re-runs everything (resumable)
 scripts/                             data loader and earlier detector wrappers (see above)
-archive/submitted_version/           earlier version of the pipeline (superseded)
+archive/earlier_version/           earlier version of the pipeline (superseded)
 data/                                datasets (downloaded, not versioned)
 ```
 
@@ -118,9 +118,9 @@ Substitutions vs. the original plan (ADBench availability): `vertebral` for arrh
 `smtp`/`skin`/full-scale `covertype` for the large-scale sets.
 **E1, E1b and E4** use all 16; **E5** uses the three largest (covertype, skin, smtp) at full size;
 the other experiments are listed in Table 3 of the paper. **E2** also uses 13 further ODDS/ADBench datasets, as distributed with the ADOD code, of which the 9 with at
-least 5,000 records are also used in **E2b** (`python revision/code/download_extra_datasets.py`).
+least 5,000 records are also used in **E2b** (`python analysis/code/download_extra_datasets.py`).
 
-> `data/*.npz` are git-ignored. The per-replicate results in `revision/experiments/*/raw/` let you
+> `data/*.npz` are git-ignored. The per-replicate results in `analysis/experiments/*/raw/` let you
 > reproduce every table and figure without re-running the experiments.
 
 ---
@@ -131,32 +131,32 @@ All experiments run on a CPU (the paper used one laptop, Intel Core i9-9980HK, 6
 
 ```bash
 python download_datasets.py                                  # 16 core datasets into data/
-bash revision/run_all.sh                                     # all experiments, tables, figures, SI
+bash analysis/run_all.sh                                     # all experiments, tables, figures, SI
 ```
 
 `run_all.sh` is resumable: a (dataset, method) unit is skipped when its CSV already holds the expected
 number of replicates. With the result files included in this repository, the analysis steps
 (`analyze_E1.py`, `analyze_rest.py`, `paper_numbers.py`, `make_si_tables.py`, `plot_fig*.py`) reproduce
 every table, figure and number of the paper in minutes; `paper_numbers.py` also needs the datasets
-(`python download_datasets.py` and `python revision/code/download_extra_datasets.py`). The largest score
+(`python download_datasets.py` and `python analysis/code/download_extra_datasets.py`). The largest score
 differences between our ADOD and the authors' code (S1 Table, from `validate_reimplementations.py`) vary
 between runs at the 10⁻⁷ level. In E1–E4 and E6, each dataset with more than
 5,000 records is represented by one fixed random subset of 5,000 records (E2b also uses subsets of
 1,000 and 2,000 records, E7 uses synthetic data, and E8 generates its data from such subsets); E5 uses
 the full datasets.
 
-Which script produces what (paths under `revision/experiments/` unless stated):
+Which script produces what (paths under `analysis/experiments/` unless stated):
 
 | Paper item | Script | Output |
 |------------|--------|--------|
-| Table 6 (E1 by tier), Table 7 (E4), E1 tests (Friedman, Wilcoxon–Holm, mixed model) | `revision/code/analyze_E1.py` | `E1/tables/` |
-| E1b, E2 rates, Table 8 (E2b), E3, Table 9 (E5), the values of Table 10 (E6), E7, E8 | `revision/code/analyze_rest.py` | `E1b/`, `E2/`, `E2b5000/`, `E2b_n_vs_p.csv`, `E3/`, `E5/`, `X5/`, `X6/`, `X7/` `tables/` |
-| E6, oblique-split check | `revision/code/oblique_variance.py` | `E6b/` |
-| Fig 1, Fig 2 | `revision/code/plot_fig1.py`, `plot_fig2.py` | `revision/figures/` (with `out_dir=revision/figures`, as in `run_all.sh`) |
-| S1–S3 Tables (S2 computed from `E1/raw/`), Table R1 of the response letter | `revision/code/make_si_tables.py` | `revision/SI/` (with `out_dir=revision/SI`, as in `run_all.sh`), `validation/implementations_vs_reference.csv` |
-| S1 Table data (ADOD port vs authors' code), Table R1 data | `revision/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
-| E5 runtimes | `revision/code/time_runtime.py` | `E5/tables/runtime_idle.csv` |
-| Numbers quoted in the text that no table prints (E1 zero spread, ties and ROD; E3 without capped cells; E5 terms of Proposition 3; E6 steps and Holm test; E8 per dataset); data of Table 4 and S3 Table | `revision/code/paper_numbers.py` | `paper_numbers.csv`, `dataset_characteristics.csv` |
+| Table 6 (E1 by tier), Table 7 (E4), E1 tests (Friedman, Wilcoxon–Holm, mixed model) | `analysis/code/analyze_E1.py` | `E1/tables/` |
+| E1b, E2 rates, Table 8 (E2b), E3, Table 9 (E5), the values of Table 10 (E6), E7, E8 | `analysis/code/analyze_rest.py` | `E1b/`, `E2/`, `E2b5000/`, `E2b_n_vs_p.csv`, `E3/`, `E5/`, `X5/`, `X6/`, `X7/` `tables/` |
+| E6, oblique-split check | `analysis/code/oblique_variance.py` | `E6b/` |
+| Fig 1, Fig 2 | `analysis/code/plot_fig1.py`, `plot_fig2.py` | `analysis/figures/` |
+| S1–S3 Tables (S2 computed from `E1/raw/`), comparison of the earlier and the reference implementations (Table R1) | `analysis/code/make_si_tables.py` | `analysis/SI/`, `validation/implementations_vs_reference.csv` |
+| S1 Table data (ADOD port vs authors' code), Table R1 data | `analysis/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
+| E5 runtimes | `analysis/code/time_runtime.py` | `E5/tables/runtime_idle.csv` |
+| Numbers quoted in the text that no table prints (E1 zero spread, ties and ROD; E3 without capped cells; E5 terms of Proposition 3; E6 steps and Holm test; E8 per dataset); data of Table 4 and S3 Table | `analysis/code/paper_numbers.py` | `paper_numbers.csv`, `dataset_characteristics.csv` |
 
 Tables 1–5 (notation, classes, experiments, datasets, methods) are written by hand.
 
@@ -165,7 +165,7 @@ To check the ADOD implementation against the authors' code (also run by `run_all
 
 ```bash
 git clone https://github.com/Qian-Lily/ADOD external/ADOD
-.venv/bin/python revision/code/validate_reimplementations.py
+.venv/bin/python analysis/code/validate_reimplementations.py
 ```
 
 ---
@@ -175,15 +175,15 @@ git clone https://github.com/Qian-Lily/ADOD external/ADOD
 This repository is the data-availability record for the paper.
 
 - **Derived data** (the per-replicate resilience results underlying every table and figure of the
-  paper): `revision/experiments/*/raw/*.csv`, with derived tables in `revision/experiments/*/tables/`,
-  regenerated with fixed seeds (replicate r uses seed 42 + r) by `revision/code/`; the E5 runtimes are
+  paper): `analysis/experiments/*/raw/*.csv`, with derived tables in `analysis/experiments/*/tables/`,
+  regenerated with fixed seeds (replicate r uses seed 42 + r) by `analysis/code/`; the E5 runtimes are
   wall-clock measurements.
 - **Benchmark datasets** (16 core datasets, plus 13 used in E2 and E2b): existing public third-party data.
   The 16 core datasets come from [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`;
   fetch with `python download_datasets.py`; full-scale Covertype/Skin also at the
   [UCI ML Repository](https://archive.ics.uci.edu/)). The 13 further datasets are the ODDS/ADBench copies
   distributed with the ADOD code (https://github.com/Qian-Lily/ADOD; fetch with
-  `python revision/code/download_extra_datasets.py`).
+  `python analysis/code/download_extra_datasets.py`).
 - **Persistent identifier:** this repository is archived on Zenodo; the concept DOI
   **`10.5281/zenodo.20829792`** (https://doi.org/10.5281/zenodo.20829792) resolves to the latest
   version, and each version also has its own DOI.
