@@ -9,6 +9,7 @@ done
 $PY revision/code/oblique_variance.py
 $PY revision/code/analyze_E1.py
 $PY revision/code/analyze_rest.py
+$PY revision/code/paper_numbers.py
 if [ -d external/ADOD ]; then $PY revision/code/validate_reimplementations.py; fi
 $PY revision/code/make_si_tables.py out_dir=revision/SI
 $PY revision/code/plot_fig1.py out_dir=revision/figures

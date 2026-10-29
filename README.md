@@ -6,7 +6,7 @@ flags on a simple random sample (without replacement) agree with those it flags 
 Both measures are label-free:
 
 - **ρ (Dice resilience):** overlap of the top-K records of the sample under the sample fit and under the
-  full-data fit (K = ⌊qn⌋, q = 10%); with ties at the cut-off, the expected overlap when tied records are
+  full-data fit (K = max(1, ⌊qn⌋), q = 10%); with ties at the cut-off, the expected overlap when tied records are
   chosen at random, independently for the two fits;
 - **ρ̃ (rank resilience):** Spearman correlation of the two score vectors on the sample.
 
@@ -47,7 +47,8 @@ revision/
 │   ├── datasets_v2.py               datasets, size tiers, synthetic data (E7, E8)
 │   ├── run_resilience.py            one runner for every experiment:  exp=E1 | E1b | E2 | E2b1000 |
 │   │                                E2b2000 | E2b5000 | E3 | E5 | X5 (paper E6) | X6 (E7) | X7 (E8)
-│   ├── analyze_E1.py, analyze_rest.py   every table and number of the Results
+│   ├── analyze_E1.py, analyze_rest.py   the tables and test results of the Results
+│   ├── paper_numbers.py                  numbers quoted in the text that no table prints; Table 4 data
 │   ├── plot_fig1.py, plot_fig2.py        Figs 1 and 2
 │   ├── make_si_tables.py                 S1–S3 Tables
 │   ├── validate_reimplementations.py     ADOD port vs authors' code; earlier vs reference implementations
@@ -71,7 +72,7 @@ data/                                datasets (downloaded, not versioned)
 
 ## Prerequisites
 
-- **Python 3.10+** (tested on 3.13)
+- **Python 3.13** (the pinned versions in `requirements.txt` need Python ≥ 3.11; the paper used 3.13.7)
 - macOS or Linux
 - Git
 
@@ -79,32 +80,18 @@ data/                                datasets (downloaded, not versioned)
 
 ## Installation
 
-### Option A — Standard install (requires cmake for PyOD's numba backend)
-
-```bash
-brew install cmake            # macOS; on Linux use the system package manager
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-`requirements-lock.txt` lists the exact versions used for the paper (Python 3.13.7); with these
-versions PyOD 0.9.9 and combo were installed without their dependencies, as in Option B.
-
-### Option B — cmake-free install (macOS + Python 3.13)
-
-Installs PyOD without numba (AutoEncoder disabled; all 18 benchmark detectors work):
-
 ```bash
 python3.13 -m venv .venv
 bash setup_env.sh
 source .venv/bin/activate
 ```
 
-`setup_env.sh` installs the scientific stack, then `pyod==0.9.9 --no-deps` with a
-minimal numba stub, and replaces a few sklearn-incompatible PyOD wrappers with direct
-sklearn calls. The ROD baseline requires a small numpy-2.0 patch (`np.asarray`),
-applied automatically.
+`setup_env.sh` installs the exact versions used for the paper (`requirements.txt`, the same as
+`requirements-lock.txt`), then PyOD 0.9.9 and combo 0.1.3 without their dependencies. If numba cannot
+be imported (there is no llvmlite wheel for macOS 26 with Python 3.13), it installs a minimal numba
+stub, under which PyOD's numba-decorated functions run as plain Python. It then patches PyOD's ROD for
+NumPy 2 (`np.array(res, copy=False)` → `np.asarray(res)` in `pyod/models/rod.py`; the scores are
+unchanged) and checks that ROD runs.
 
 ---
 
@@ -114,7 +101,7 @@ Datasets are from the [ADBench benchmark](https://github.com/Minqi824/ADBench)
 (binary `.npz`, not stored in the repo):
 
 ```bash
-python download_datasets.py          # the 16 benchmark datasets (~50 MB)
+python download_datasets.py          # the 16 benchmark datasets (~50 MB), checked against SHA-256
 ```
 
 The 16 datasets, by size tier:
@@ -143,16 +130,16 @@ All experiments run on a CPU (the paper used one laptop, Intel Core i9-9980HK, 6
 
 ```bash
 python download_datasets.py                                  # 16 core datasets into data/
-.venv/bin/pip install hydra-core omegaconf statsmodels scikit-posthocs isotree
-.venv/bin/pip install combo --no-deps                        # needed by PyOD's Feature Bagging
 bash revision/run_all.sh                                     # all experiments, tables, figures, SI
 ```
 
 `run_all.sh` is resumable: a (dataset, method) unit is skipped when its CSV already holds the expected
 number of replicates. With the result files included in this repository, the analysis steps alone
-(`analyze_E1.py`, `analyze_rest.py`, `make_si_tables.py`, `plot_fig*.py`) reproduce every table and
-figure in minutes. Datasets with more than 5,000 records are represented in E1–E4 and E6–E8 by one fixed
-random subset of 5,000 records; E5 uses the full datasets.
+(`analyze_E1.py`, `analyze_rest.py`, `paper_numbers.py`, `make_si_tables.py`, `plot_fig*.py`) reproduce
+every table, figure and number of the paper in minutes. In E1–E4 and E6, each dataset with more than
+5,000 records is represented by one fixed random subset of 5,000 records (E2b also uses subsets of
+1,000 and 2,000 records, E7 uses synthetic data, and E8 generates its data from such subsets); E5 uses
+the full datasets.
 
 Which script produces what (paths under `revision/experiments/` unless stated):
 
@@ -165,6 +152,7 @@ Which script produces what (paths under `revision/experiments/` unless stated):
 | S1–S3 Tables (S2 computed from `E1/raw/`), Table R1 of the response letter | `revision/code/make_si_tables.py` | `revision/SI/` (with `out_dir=revision/SI`, as in `run_all.sh`), `validation/implementations_vs_reference.csv` |
 | S1 Table data (ADOD port vs authors' code), Table R1 data | `revision/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
 | E5 runtimes | `revision/code/time_runtime.py` | `E5/tables/runtime_idle.csv` |
+| Numbers quoted in the text that no table prints (E1 zero spread, ties and ROD; E3 without capped cells; E5 terms of Proposition 3; E6 steps and Holm test; E8 per dataset); data of Table 4 and S3 Table | `revision/code/paper_numbers.py` | `paper_numbers.csv`, `dataset_characteristics.csv` |
 
 Tables 1–5 (notation, classes, experiments, datasets, methods) are written by hand.
 
@@ -184,7 +172,8 @@ This repository is the data-availability record for the paper.
 
 - **Derived data** (the per-replicate resilience results underlying every table and figure of the
   paper): `revision/experiments/*/raw/*.csv`, with derived tables in `revision/experiments/*/tables/`,
-  regenerated deterministically (fixed seeds) by `revision/code/`.
+  regenerated with fixed seeds (replicate r uses seed 42 + r) by `revision/code/`; the E5 runtimes are
+  wall-clock measurements.
 - **Benchmark datasets** (16 core datasets, plus 13 used in E2 and E2b): existing public third-party data.
   The 16 core datasets come from [ADBench](https://github.com/Minqi824/ADBench) (`adbench/datasets/Classical/`;
   fetch with `python download_datasets.py`; full-scale Covertype/Skin also at the

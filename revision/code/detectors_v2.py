@@ -8,8 +8,9 @@ records that belong to the training set (records of S under the model fitted on 
 records of S under the model fitted on S), so in-sample scores are the correct object.
 
 Reference implementations are used wherever one exists in this environment:
-    COPOD, ECOD, HBOS, KNN, ABOD, FeatureBagging, ROD      -> PyOD 0.9.9 (default parameters)
+    COPOD, ECOD, HBOS, ABOD, FeatureBagging, ROD           -> PyOD 0.9.9 (default parameters)
     LOF, OCSVM, IForest                                     -> scikit-learn (PyOD wraps these)
+    KNN                                                     -> scikit-learn NearestNeighbors (PyOD definition)
     Mahalanobis                                             -> scikit-learn EmpiricalCovariance
     EIF                                                     -> isotree (ndim = d: extended model of Hariri et al.)
     ADOD                                                    -> CPU port of the authors' code (github.com/Qian-Lily/ADOD,
@@ -18,7 +19,7 @@ Reference implementations are used wherever one exists in this environment:
 Textbook rules implemented directly (no library reference exists): ThreeSigma, BoxPlot, MAD,
 ChiSquare (diagonal Mahalanobis), KMeans (distance to nearest of 8 centroids, standardised features).
 
-Method classes (revised taxonomy, see paper Table 4):
+Method classes (revised taxonomy, see paper Tables 2 and 5):
     I   global location/scale statistics : ThreeSigma, BoxPlot, MAD, ChiSquare, Mahalanobis, ROD
     II  empirical-CDF / histogram        : COPOD, ECOD, HBOS
     III internal-subsampling ensembles   : IForest, EIF

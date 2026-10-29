@@ -85,7 +85,7 @@ def main(c: Cfg) -> None:
     b.text(-0.02, 1.04, "B", transform=b.transAxes, fontweight="bold", fontsize=10, ha="right")
     for ax in (a, b):
         ax.spines[["top", "right"]].set_visible(False); ax.grid(lw=0.3, color="0.9"); ax.set_axisbelow(True)
-    out = PROJECT / c.out_dir
+    out = PROJECT / c.out_dir; out.mkdir(parents=True, exist_ok=True)
     fig.savefig(out / "Fig2.tif", dpi=c.dpi, bbox_inches="tight", pad_inches=0.05,
                 pil_kwargs={"compression": "tiff_lzw"})
     from PIL import Image

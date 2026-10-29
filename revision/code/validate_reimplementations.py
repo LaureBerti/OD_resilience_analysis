@@ -6,7 +6,8 @@
 (b) Earlier wrappers (scripts/method_wrappers.py) vs the reference
     implementations now used (detectors_v2), on the in-sample scores of each dataset.
 
-Output: revision/experiments/validation/reimpl_validation.csv (+ .md). CPU-only.
+A comparison is undefined (NaN) when either score vector has no finite value or is constant (SD below 1e-12).
+Output: revision/experiments/validation/reimpl_validation.csv. CPU-only.
 Run: .venv/bin/python revision/code/validate_reimplementations.py [val.datasets='[glass,vertebral]'] [val.adod_only=true]
 """
 from __future__ import annotations
@@ -88,11 +89,14 @@ def original_adod_scores(X, repo):
 
 def cmp(a, b):
     a, b = np.asarray(a, float), np.asarray(b, float)
+    sa, sb = float(np.std(a)), float(np.std(b))
+    if not (np.isfinite(a).any() and np.isfinite(b).any()) or np.nanstd(a) < 1e-12 or np.nanstd(b) < 1e-12:
+        return np.nan, np.nan, sa, sb
     ok = np.isfinite(a) & np.isfinite(b)
     r = spearmanr(a[ok], b[ok]).statistic if ok.sum() > 2 and a[ok].std() > 0 and b[ok].std() > 0 else np.nan
     k = max(1, int(0.1 * len(a)))
     ta, tb = set(np.argsort(-a, kind="stable")[:k]), set(np.argsort(-b, kind="stable")[:k])
-    return r, len(ta & tb) / k, float(np.std(a)), float(np.std(b))
+    return r, len(ta & tb) / k, sa, sb
 
 
 @hydra.main(version_base=None, config_name="val")

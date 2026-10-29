@@ -2,7 +2,7 @@
 
 load(name, n_cap, seed) -> (X, y, meta)
   * the 16 core benchmark datasets (data/*.npz, via github_repo/scripts/data_loader.py);
-  * 13 extra datasets with N >= 1,000 for E2 (data/extra/*.npz, see data/extra/README.md);
+  * 13 extra datasets with N >= 1,000 for E2 (data/extra/*.npz, fetched by download_extra_datasets.py);
   * gauss_d{d}: synthetic Gaussian data for the dimension study (X6);
   * {local,global,clustered}_{base}: ADBench realistic-synthetic anomalies (X7) generated from a
     core dataset following ADBench's generate_realistic_synthetic (Han et al. 2022): a Gaussian

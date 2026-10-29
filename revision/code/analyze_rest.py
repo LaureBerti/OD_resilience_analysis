@@ -1,7 +1,7 @@
 """analyze_rest.py — tables for E1b, E2, E2b, E3, E5, E6 (=X5), E7 (=X6), E8 (=X7).
 
-Every number of the revised Results section outside E1/E4 comes from the CSVs written here
-(revision/experiments/<exp>/tables/). Dataset = unit of analysis; replicates are averaged first.
+The numbers of the Results section outside E1/E4 come from the CSVs written here
+(revision/experiments/<exp>/tables/), except those listed in paper_numbers.py. Dataset = unit of analysis; replicates are averaged first.
 Run: .venv/bin/python revision/code/analyze_rest.py [a.only='[E2,E3]']
 """
 from __future__ import annotations

@@ -1,0 +1,70 @@
+item,key,value
+E1 zero spread,lympho MAD: features in full fit / samples of 50,13 / 50
+E1 zero spread,lympho IQR: features in full fit / samples of 50,6 / 50
+E1 zero spread,glass MAD: features in full fit / samples of 50,0 / 1
+E1 zero spread,glass IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,vertebral MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,vertebral IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,ionosphere MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,ionosphere IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,breastw MAD: features in full fit / samples of 50,7 / 50
+E1 zero spread,breastw IQR: features in full fit / samples of 50,1 / 48
+E1 zero spread,letter MAD: features in full fit / samples of 50,4 / 50
+E1 zero spread,letter IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,musk MAD: features in full fit / samples of 50,3 / 50
+E1 zero spread,musk IQR: features in full fit / samples of 50,1 / 32
+E1 zero spread,thyroid MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,thyroid IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,optdigits MAD: features in full fit / samples of 50,28 / 50
+E1 zero spread,optdigits IQR: features in full fit / samples of 50,17 / 50
+E1 zero spread,satellite MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,satellite IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,pendigits MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,pendigits IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,annthyroid MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,annthyroid IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,shuttle MAD: features in full fit / samples of 50,2 / 50
+E1 zero spread,shuttle IQR: features in full fit / samples of 50,2 / 50
+E1 zero spread,smtp MAD: features in full fit / samples of 50,0 / 23
+E1 zero spread,smtp IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,skin MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,skin IQR: features in full fit / samples of 50,0 / 0
+E1 zero spread,covertype MAD: features in full fit / samples of 50,0 / 0
+E1 zero spread,covertype IQR: features in full fit / samples of 50,0 / 0
+E1 ties,share of MAD and BoxPlot replicates tied at the K-th score,0.682
+E1 ties,"median of max(ties_S, ties_D) among tied replicates",4.0
+E1 ROD,"mean rho, d <= 5 (no projection)",0.776
+E1 ROD,"mean rho, d > 5",0.515
+E3 capped,KNN capped cells,8
+E3 capped,"KNN a, all cells","-0.0232 [-0.2143, 0.1680]"
+E3 capped,"KNN b, all cells","-0.3699 [-0.4549, -0.2850]"
+E3 capped,"KNN a, capped cells left out","-0.0306 [-0.2109, 0.1498]"
+E3 capped,"KNN b, capped cells left out","-0.3626 [-0.4369, -0.2883]"
+E3 capped,LOF capped cells,8
+E3 capped,"LOF a, all cells","-0.0962 [-0.2182, 0.0259]"
+E3 capped,"LOF b, all cells","-0.1809 [-0.2583, -0.1035]"
+E3 capped,"LOF a, capped cells left out","-0.1309 [-0.2314, -0.0305]"
+E3 capped,"LOF b, capped cells left out","-0.1470 [-0.1947, -0.0993]"
+E5 forest terms,"covertype p=0.01: psi^2/(N-psi^2), psi/(n-psi)","0.2972, 0.0983"
+E5 forest terms,"covertype p=0.05: psi^2/(N-psi^2), psi/(n-psi)","0.2972, 0.0182"
+E5 forest terms,"covertype p=0.1: psi^2/(N-psi^2), psi/(n-psi)","0.2972, 0.0090"
+E5 forest terms,"skin p=0.01: psi^2/(N-psi^2), psi/(n-psi)","0.3651, 0.1167"
+E5 forest terms,"skin p=0.05: psi^2/(N-psi^2), psi/(n-psi)","0.3651, 0.0213"
+E5 forest terms,"skin p=0.1: psi^2/(N-psi^2), psi/(n-psi)","0.3651, 0.0106"
+E5 forest terms,"smtp p=0.01: psi^2/(N-psi^2), psi/(n-psi)","2.2126, 0.3683"
+E5 forest terms,"smtp p=0.05: psi^2/(N-psi^2), psi/(n-psi)","2.2126, 0.0569"
+E5 forest terms,"smtp p=0.1: psi^2/(N-psi^2), psi/(n-psi)","2.2126, 0.0276"
+E6 trees,EIF: datasets with rho(T=1000) > rho(T=50),8 of 8
+E6 trees,IForest: datasets with rho(T=1000) > rho(T=50),8 of 8
+E6 trees,non-increasing steps / all steps,5 / 64
+E6 trees,largest change at a non-increasing step,0.0027
+E6 trees,"EIF: Wilcoxon p, Holm-adjusted p","0.0078, 0.0156"
+E6 trees,"IForest: Wilcoxon p, Holm-adjusted p","0.0078, 0.0156"
+E8 types,"Class I on annthyroid: clustered 0.8894, global 0.9457, local 0.9093",lowest: clustered
+E8 types,"Class I on pendigits: clustered 0.8637, global 0.8636, local 0.8698",lowest: global
+E8 types,"Class I on satellite: clustered 0.9208, global 0.7316, local 0.8751",lowest: global
+E8 types,"Class I on thyroid: clustered 0.9101, global 0.9117, local 0.9026",lowest: local
+E8 types,"Class II on annthyroid: clustered 0.8670, global 0.9399, local 0.8431",lowest: local
+E8 types,"Class II on pendigits: clustered 0.8269, global 0.8800, local 0.8413",lowest: clustered
+E8 types,"Class II on satellite: clustered 0.9467, global 0.8773, local 0.8847",lowest: global
+E8 types,"Class II on thyroid: clustered 0.8547, global 0.8871, local 0.8344",lowest: local

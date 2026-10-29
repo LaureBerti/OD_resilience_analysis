@@ -46,16 +46,19 @@ the analysis. They are superseded and do not underlie the tables or figures of t
 | `revision/experiments/X6/raw/`  | E7 | ρ against the dimension d (synthetic data) |
 | `revision/experiments/X7/raw/`  | E8 | ρ by anomaly type (local, global, clustered) |
 | `revision/experiments/validation/` | S1 Table; Table R1 of the response letter | implementation checks |
+| `revision/experiments/paper_numbers.csv`, `dataset_characteristics.csv` | numbers quoted in the text; Table 4, S3 Table | written by `paper_numbers.py` |
 
-All are produced deterministically (replicate `r` uses seed `42 + r`) by the scripts in
-`revision/code/`; the README lists which script produces each table and figure.
+All are produced with fixed seeds (replicate `r` uses seed `42 + r`; tree `t` of the oblique-split check
+of E6 uses `42 + 10t`) by the scripts in `revision/code/`, except the E5 runtimes, which are wall-clock
+measurements; the README lists which script produces each table, figure and number.
 
 ## Third-party benchmark datasets (16 core datasets)
 
 All obtained from **ADBench** — Han, Hu, Huang, Jiang & Zhao, *"ADBench: Anomaly
 Detection Benchmark"*, NeurIPS 2022 — at
 <https://github.com/Minqi824/ADBench> (`adbench/datasets/Classical/`).
-Reproduce the exact files with `python download_datasets.py`.
+`python download_datasets.py` downloads them and checks each file against the SHA-256 of the copy used
+for the paper.
 
 | Our name | ADBench file | Tier | Source |
 |----------|--------------|------|--------|

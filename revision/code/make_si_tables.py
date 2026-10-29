@@ -51,11 +51,13 @@ def main(c: Cfg) -> None:
     att = EXP / "validation"; att.mkdir(parents=True, exist_ok=True)
     r1 = s1[~s1.comparison.str.startswith("ADOD")]
     r1.round(4).to_csv(att / "implementations_vs_reference.csv", index=False)
-    summ = r1.groupby("method").agg(median_spearman=("spearman_rank_correlation", "median"),
+    summ = r1.groupby("method").agg(n_datasets_spearman=("spearman_rank_correlation", "count"),
+                                    median_spearman=("spearman_rank_correlation", "median"),
                                     min_spearman=("spearman_rank_correlation", "min"),
+                                    n_datasets_top10=("overlap_of_top_10pct", "count"),
                                     median_top10=("overlap_of_top_10pct", "median"),
                                     min_top10=("overlap_of_top_10pct", "min")).sort_values("median_spearman")
-    summ.round(3).to_csv(att / "implementations_vs_reference_summary.csv")
+    summ.round(4).to_csv(att / "implementations_vs_reference_summary.csv")
 
     df = pd.concat([pd.read_csv(f) for f in sorted((EXP / "E1" / "raw").glob("*.csv"))], ignore_index=True)
     g = df.groupby(["dataset", "tier", "method", "method_class"]).agg(
