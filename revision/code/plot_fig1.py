@@ -75,7 +75,7 @@ def main(c: Cfg) -> None:
         for m in METHODS[k]:
             v = dm[dm.method == m].rho.values
             b.scatter(pos + rng.uniform(-0.18, 0.18, len(v)), v, s=6, color=COLOR[k], alpha=0.8, lw=0)
-            b.hlines(np.mean(v), pos - 0.3, pos + 0.3, color="black", lw=0.9)
+            b.hlines(np.nanmean(v), pos - 0.3, pos + 0.3, color="black", lw=0.9)
             ticks.append(pos); labels.append(SHORT[m]); pos += 1
         pos += 0.6
     b.set_xticks(ticks, labels, rotation=90)

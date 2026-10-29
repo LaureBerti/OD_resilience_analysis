@@ -1,6 +1,6 @@
 """oblique_variance.py — per-tree depth variance of axis-parallel vs oblique (fully extended) isolation trees.
 
-Tests the stylized derivation (S1 Appendix, Lemma S4): under independent per-split separation with
+Tests the stylized derivation (S1 Appendix, Lemma S3): under independent per-split separation with
 equal feature ranges, Var_oblique / Var_axis = s^2 / (d c_d^2) (about (pi/2) s^2 for large d), where
 c_d = E|u_1| for u uniform on the unit sphere, s = ||delta||_1 / (sqrt(d) ||delta||_2) and
 delta = x - (coordinate-wise median), features min-max scaled.
