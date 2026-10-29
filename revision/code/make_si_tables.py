@@ -50,7 +50,8 @@ def main(c: Cfg) -> None:
     a.to_csv(out / "S1_Table.csv", index=False, float_format="%.4g")
     att = EXP / "validation"; att.mkdir(parents=True, exist_ok=True)
     r1 = s1[~s1.comparison.str.startswith("ADOD")]
-    r1.round(4).to_csv(att / "implementations_vs_reference.csv", index=False)
+    r1.assign(**{c: r1[c].round(4) for c in ["spearman_rank_correlation", "overlap_of_top_10pct"]}).to_csv(
+        att / "implementations_vs_reference.csv", index=False, float_format="%.4g")
     summ = r1.groupby("method").agg(n_datasets_spearman=("spearman_rank_correlation", "count"),
                                     median_spearman=("spearman_rank_correlation", "median"),
                                     min_spearman=("spearman_rank_correlation", "min"),

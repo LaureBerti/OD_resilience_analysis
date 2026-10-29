@@ -48,8 +48,8 @@ the analysis. They are superseded and do not underlie the tables or figures of t
 | `revision/experiments/validation/` | S1 Table; Table R1 of the response letter | implementation checks |
 | `revision/experiments/paper_numbers.csv`, `dataset_characteristics.csv` | numbers quoted in the text; Table 4, S3 Table | written by `paper_numbers.py` |
 
-All are produced with fixed seeds (replicate `r` uses seed `42 + r`; tree `t` of the oblique-split check
-of E6 uses `42 + 10t`) by the scripts in `revision/code/`, except the E5 runtimes, which are wall-clock
+All are produced with fixed seeds (replicate `r` uses seed `42 + r`; in the oblique-split check of E6, the
+axis-parallel tree `t` uses `42 + 10t` and the oblique tree `t` uses `42 + 10t + 1`) by the scripts in `revision/code/`, except the E5 runtimes, which are wall-clock
 measurements; the README lists which script produces each table, figure and number.
 
 ## Third-party benchmark datasets (16 core datasets)

@@ -86,8 +86,9 @@ bash setup_env.sh
 source .venv/bin/activate
 ```
 
-`setup_env.sh` installs the exact versions used for the paper (`requirements.txt`, the same as
-`requirements-lock.txt`), then PyOD 0.9.9 and combo 0.1.3 without their dependencies. If numba cannot
+`setup_env.sh` installs the top-level packages at the versions used for the paper (`requirements.txt`;
+`requirements-lock.txt` lists the same versions plus PyOD and combo; the dependencies these packages pull
+in are not pinned), then PyOD 0.9.9 and combo 0.1.3 without their dependencies. If numba cannot
 be imported (there is no llvmlite wheel for macOS 26 with Python 3.13), it installs a minimal numba
 stub, under which PyOD's numba-decorated functions run as plain Python. It then patches PyOD's ROD for
 NumPy 2 (`np.array(res, copy=False)` → `np.asarray(res)` in `pyod/models/rod.py`; the scores are
@@ -101,7 +102,7 @@ Datasets are from the [ADBench benchmark](https://github.com/Minqi824/ADBench)
 (binary `.npz`, not stored in the repo):
 
 ```bash
-python download_datasets.py          # the 16 benchmark datasets (~50 MB), checked against SHA-256
+python download_datasets.py          # the 16 benchmark datasets (~6 MB), checked against SHA-256
 ```
 
 The 16 datasets, by size tier:
@@ -134,9 +135,12 @@ bash revision/run_all.sh                                     # all experiments, 
 ```
 
 `run_all.sh` is resumable: a (dataset, method) unit is skipped when its CSV already holds the expected
-number of replicates. With the result files included in this repository, the analysis steps alone
+number of replicates. With the result files included in this repository, the analysis steps
 (`analyze_E1.py`, `analyze_rest.py`, `paper_numbers.py`, `make_si_tables.py`, `plot_fig*.py`) reproduce
-every table, figure and number of the paper in minutes. In E1–E4 and E6, each dataset with more than
+every table, figure and number of the paper in minutes; `paper_numbers.py` also needs the datasets
+(`python download_datasets.py` and `python revision/code/download_extra_datasets.py`). The largest score
+differences between our ADOD and the authors' code (S1 Table, from `validate_reimplementations.py`) vary
+between runs at the 10⁻⁷ level. In E1–E4 and E6, each dataset with more than
 5,000 records is represented by one fixed random subset of 5,000 records (E2b also uses subsets of
 1,000 and 2,000 records, E7 uses synthetic data, and E8 generates its data from such subsets); E5 uses
 the full datasets.
