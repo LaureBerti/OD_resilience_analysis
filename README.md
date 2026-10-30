@@ -198,7 +198,7 @@ This repository is the data-availability record for the paper.
 ```bibtex
 @unpublished{bertiequille2026resilience,
   title   = {Outlier Detection Methods Are Not Equally Resilient to Sampling},
-  author  = {Berti-\'{E}quille, Laure and Loh, Ji Meng},
+  author  = {Berti-Equille, Laure and Loh, Ji Meng},
   note    = {Manuscript under review},
   year    = {2026}
 }

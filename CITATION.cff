@@ -3,7 +3,7 @@ message: "If you use this code or data, please cite the paper."
 type: software
 title: "Outlier Detection Methods Are Not Equally Resilient to Sampling"
 authors:
-  - family-names: Berti-Équille
+  - family-names: Berti-Equille
     given-names: Laure
     email: laure.berti@ird.fr
     orcid: "https://orcid.org/0000-0002-8046-0570"
@@ -16,13 +16,13 @@ identifiers:
     value: "10.5281/zenodo.20829792"
     description: "Zenodo archive of this repository (concept DOI, all versions)"
 license: MIT
-version: "3.0.2"
-date-released: "2026-10-29"
+version: "3.0.3"
+date-released: "2026-10-30"
 preferred-citation:
   type: article
   title: "Outlier Detection Methods Are Not Equally Resilient to Sampling"
   authors:
-    - family-names: Berti-Équille
+    - family-names: Berti-Equille
       given-names: Laure
     - family-names: Loh
       given-names: Ji Meng
