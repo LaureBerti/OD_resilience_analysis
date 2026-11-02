@@ -14,8 +14,9 @@ There are two kinds of data:
    They are not redistributed here (they are git-ignored) but are downloaded on demand from
    their public sources by `download_datasets.py` and `analysis/code/download_extra_datasets.py`.
 
-The folder `archive/earlier_version/` holds the results and scripts of an earlier version of
-the analysis. They are superseded and do not underlie the tables or figures of the paper.
+Apart from the data loader and the earlier detector wrappers in `scripts/`, the earlier version of the
+analysis is not part of this repository; it is superseded and does not underlie the tables or figures
+of the paper.
 
 ---
 

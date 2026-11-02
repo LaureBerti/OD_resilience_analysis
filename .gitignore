@@ -7,10 +7,8 @@ data/*.npz
 *.egg-info/
 .env
 
-# Local build/distribution artifact (not part of the published repo)
 OD_resilience.zip
 
-# Downloaded extra datasets and external code are not versioned
 data/extra/*.npz
 external/
 analysis/experiments/_smoke*/

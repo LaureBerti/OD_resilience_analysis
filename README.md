@@ -14,8 +14,8 @@ The code, raw results of every replicate, and scripts that produce every table a
 are in **`analysis/`**. `scripts/` holds two files of an earlier version that are still used:
 `scripts/data_loader.py` loads the data, and `scripts/method_wrappers.py` is the earlier set of detector
 implementations that `analysis/code/validate_reimplementations.py` compares with the reference
-implementations. Everything else from the earlier version (its scripts, results, tables and figures)
-is in `archive/earlier_version/`; it is superseded and does not underlie the paper.
+implementations. The rest of the earlier version is not part of this repository; it is superseded and
+does not underlie the paper.
 
 > **Status:** manuscript under review (2026).
 
@@ -64,7 +64,6 @@ analysis/
 ├── figures/                         Fig1.tif, Fig2.tif
 └── run_all.sh                       re-runs everything (resumable)
 scripts/                             data loader and earlier detector wrappers (see above)
-archive/earlier_version/           earlier version of the pipeline (superseded)
 data/                                datasets (downloaded, not versioned)
 ```
 
