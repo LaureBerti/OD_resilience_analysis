@@ -14,9 +14,8 @@ There are two kinds of data:
    They are not redistributed here (they are git-ignored) but are downloaded on demand from
    their public sources by `download_datasets.py` and `analysis/code/download_extra_datasets.py`.
 
-Apart from the data loader and the earlier detector wrappers in `scripts/`, the earlier version of the
-analysis is not part of this repository; it is superseded and does not underlie the tables or figures
-of the paper.
+`scripts/` holds the data loader and the earlier detector implementations, which
+`analysis/code/validate_reimplementations.py` compares with the reference implementations.
 
 ---
 
@@ -46,7 +45,7 @@ of the paper.
 | `analysis/experiments/E6b/`     | E6 (oblique splits) | per-record depth variances, axis-parallel vs oblique trees |
 | `analysis/experiments/X6/raw/`  | E7 | ρ against the dimension d (synthetic data) |
 | `analysis/experiments/X7/raw/`  | E8 | ρ by anomaly type (local, global, clustered) |
-| `analysis/experiments/validation/` | S1 Table; comparison of the earlier and the reference implementations (Table R1) | implementation checks |
+| `analysis/experiments/validation/` | S1 Table; comparison of the earlier and the reference implementations | implementation checks |
 | `analysis/experiments/paper_numbers.csv`, `dataset_characteristics.csv` | numbers quoted in the text; Table 4, S3 Table | written by `paper_numbers.py` |
 
 All are produced with fixed seeds (replicate `r` uses seed `42 + r`; in the oblique-split check of E6, the

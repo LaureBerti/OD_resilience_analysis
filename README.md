@@ -11,11 +11,9 @@ Both measures are label-free:
 - **ρ̃ (rank resilience):** Spearman correlation of the two score vectors on the sample.
 
 The code, raw results of every replicate, and scripts that produce every table and figure of the paper
-are in **`analysis/`**. `scripts/` holds two files of an earlier version that are still used:
-`scripts/data_loader.py` loads the data, and `scripts/method_wrappers.py` is the earlier set of detector
-implementations that `analysis/code/validate_reimplementations.py` compares with the reference
-implementations. The rest of the earlier version is not part of this repository; it is superseded and
-does not underlie the paper.
+are in **`analysis/`**. `scripts/` holds the data loader (`scripts/data_loader.py`) and the earlier detector implementations
+(`scripts/method_wrappers.py`), which `analysis/code/validate_reimplementations.py` compares with the
+reference implementations.
 
 > **Status:** manuscript under review (2026).
 
@@ -152,8 +150,8 @@ Which script produces what (paths under `analysis/experiments/` unless stated):
 | E1b, E2 rates, Table 8 (E2b), E3, Table 9 (E5), the values of Table 10 (E6), E7, E8 | `analysis/code/analyze_rest.py` | `E1b/`, `E2/`, `E2b5000/`, `E2b_n_vs_p.csv`, `E3/`, `E5/`, `X5/`, `X6/`, `X7/` `tables/` |
 | E6, oblique-split check | `analysis/code/oblique_variance.py` | `E6b/` |
 | Fig 1, Fig 2 | `analysis/code/plot_fig1.py`, `plot_fig2.py` | `analysis/figures/` |
-| S1–S3 Tables (S2 computed from `E1/raw/`), comparison of the earlier and the reference implementations (Table R1) | `analysis/code/make_si_tables.py` | `analysis/SI/`, `validation/implementations_vs_reference.csv` |
-| S1 Table data (ADOD port vs authors' code), Table R1 data | `analysis/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
+| S1–S3 Tables (S2 computed from `E1/raw/`), comparison of the earlier and the reference implementations | `analysis/code/make_si_tables.py` | `analysis/SI/`, `validation/implementations_vs_reference.csv` |
+| S1 Table data (ADOD port vs authors' code), data of the comparison of the earlier and the reference implementations | `analysis/code/validate_reimplementations.py` | `validation/reimpl_validation.csv` |
 | E5 runtimes | `analysis/code/time_runtime.py` | `E5/tables/runtime_idle.csv` |
 | Numbers quoted in the text that no table prints (E1 zero spread, ties and ROD; E3 without capped cells; E5 terms of Proposition 3; E6 steps and Holm test; E8 per dataset); data of Table 4 and S3 Table | `analysis/code/paper_numbers.py` | `paper_numbers.csv`, `dataset_characteristics.csv` |
 
